@@ -1,21 +1,31 @@
-# gocron
+# vue
 
-> 定时任务管理系统
+|    环境    |    版本    |
+|:--------:|:--------:|
+|   node   | v14.18.1 |
+|   npm    |  8.10.0  |
+|   vue    |  3.2.13  |
+| @vue/cli |  5.0.4   |
 
-## Build Setup
-
-``` bash
-# install dependencies
-yarn install
-
-# serve with hot reload at localhost:8080
-yarn run dev
-
-# build for production with minification
-yarn run build
-
-# build for production and view the bundle analyzer report
-yarn run build --report
+## Project setup
+```
+npm install
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

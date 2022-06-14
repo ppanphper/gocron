@@ -320,6 +320,16 @@ func (setting *Setting) LdapSettings() (map[string]string, error) {
 	return res, err
 }
 
+func (setting *Setting) SystemSettings() map[string]string {
+	var settings []Setting
+	_ = Db.AllCols().Where("`code` = ?", "system").Find(&settings)
+	var res = make(map[string]string, len(settings))
+	for _, s := range settings {
+		res[s.Key] = s.Value
+	}
+	return res
+}
+
 func (setting *Setting) Get(code, key string) Setting {
 	s := Setting{}
 	_, _ = Db.Where("`code` = ? and `key` = ?", code, key).Get(&s)
@@ -339,4 +349,5 @@ func (setting *Setting) Set(code, key string, value string) error {
 	}
 	return err
 }
+
 // endregion

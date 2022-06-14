@@ -1,4 +1,14 @@
-FROM alpine:3.7
+FROM golang:1.18-alpine as builder
+
+COPY . /var/www/gocron
+
+WORKDIR /var/www/gocron
+
+RUN go env -w GO111MODULE=on && \
+    go env -w GOPROXY=https://goproxy.cn,direct && \
+    go build -v -tags netgo cmd/gocron/gocron.go
+
+FROM alpine:3.12
 
 RUN apk add --no-cache ca-certificates tzdata \
     && addgroup -S app \
@@ -8,11 +18,14 @@ RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 WORKDIR /app
 
-COPY gocron .
+COPY --from=builder /var/www/gocron/gocron .
 
 RUN chown -R app:app ./
 
 EXPOSE 5920
+
+VOLUME /app/log
+VOLUME /app/conf
 
 USER app
 

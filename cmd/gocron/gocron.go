@@ -1,4 +1,5 @@
 // Command gocron
+
 //go:generate statik -src=../../web/vue/dist -dest=../../internal -f
 
 package main
@@ -21,12 +22,12 @@ import (
 )
 
 var (
-	AppVersion = "1.5"
+	AppVersion = "2.0.0"
 	GitCommit  string
 	BuildDate  string
 )
 
-// web服务器默认端口
+// DefaultPort web服务器默认端口
 const DefaultPort = 5920
 
 func main() {
@@ -108,6 +109,8 @@ func initModule() {
 
 	// 初始化定时任务
 	service.ServiceTask.Initialize()
+
+	service.ProcessService.Initialize()
 }
 
 // 解析端口

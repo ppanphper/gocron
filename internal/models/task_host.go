@@ -6,17 +6,6 @@ type TaskHost struct {
 	HostId int16 `json:"host_id" xorm:"smallint not null index"`
 }
 
-type TaskHostDetail struct {
-	TaskHost `xorm:"extends"`
-	Name     string `json:"name"`
-	Port     int    `json:"port"`
-	Alias    string `json:"alias"`
-}
-
-func (TaskHostDetail) TableName() string {
-	return TablePrefix + "task_host"
-}
-
 func hostTableName() []string {
 	return []string{TablePrefix + "host", "h"}
 }
@@ -45,19 +34,18 @@ func (th *TaskHost) Add(taskId int, hostIds []int) error {
 	return err
 }
 
-func (th *TaskHost) GetHostIdsByTaskId(taskId int) ([]TaskHostDetail, error) {
-	list := make([]TaskHostDetail, 0)
-	fields := "th.id,th.host_id,h.alias,h.name,h.port"
-	err := Db.Alias("th").
-		Join("LEFT", hostTableName(), "th.host_id=h.id").
+func (th *TaskHost) GetHostsByTaskId(taskId int) ([]Host, error) {
+	list := make([]Host, 0)
+	err := Db.Table(hostTableName()).
+		Join("LEFT", []string{TablePrefix + "task_host", "th"}, "h.id=th.host_id").
 		Where("th.task_id = ?", taskId).
-		Cols(fields).
+		Cols("h.*").
 		Find(&list)
 
 	return list, err
 }
 
-func (th *TaskHost) GetTaskIdsByHostId(hostId int16) ([]interface{}, error) {
+func (th *TaskHost) GetTaskIdsByHostId(hostId int) ([]interface{}, error) {
 	list := make([]TaskHost, 0)
 	err := Db.Where("host_id = ?", hostId).Cols("task_id").Find(&list)
 	if err != nil {
@@ -72,7 +60,7 @@ func (th *TaskHost) GetTaskIdsByHostId(hostId int16) ([]interface{}, error) {
 	return taskIds, err
 }
 
-// 判断主机id是否有引用
+// HostIdExist 判断主机id是否有引用
 func (th *TaskHost) HostIdExist(hostId int16) (bool, error) {
 	count, err := Db.Where("host_id = ?", hostId).Count(th)
 

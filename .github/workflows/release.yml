@@ -1,0 +1,44 @@
+name: Github Release
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: git fetch --all --tags
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '^1.18.0'
+      - run: go version
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: |
+          npm -v
+          npm install --location=global @vue/cli
+          npm install web/vue/
+
+      - name: Build
+        run: |
+          go install github.com/rakyll/statik
+          export PATH=${PATH}:$(go env GOPATH)/bin
+          sed -i "s/\r//g" package.sh          
+          make package-all          
+
+      - name: Release
+        env:
+          token: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          git version
+          git remote -v          
+          bash release.sh "${token}"

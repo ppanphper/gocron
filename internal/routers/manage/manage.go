@@ -54,7 +54,7 @@ func RemoveSlackChannel(ctx *macaron.Context) string {
 
 // endregion
 
-// region 邮件
+// Mail region 邮件
 func Mail(ctx *macaron.Context) string {
 	settingModel := new(models.Setting)
 	mail, err := settingModel.Mail()
@@ -156,6 +156,20 @@ func UpdateLdapSetting(ctx *macaron.Context, form LdapSettingForm) string {
 
 	jsonResp := utils.JsonResponse{}
 	return jsonResp.Success(utils.SuccessContent, nil)
+}
+
+func UpdateSystemSetting(ctx *macaron.Context) string {
+	s := new(models.Setting)
+
+	_ = s.Set("system", "logo", ctx.Req.FormValue("logo"))
+	_ = s.Set("system", "title", ctx.Req.FormValue("title"))
+
+	return utils.JsonResp.Success(utils.SuccessContent, nil)
+}
+
+func GetSystemSetting() string {
+	s := new(models.Setting)
+	return utils.JsonResp.Success(utils.SuccessContent, s.SystemSettings())
 }
 
 // endregion

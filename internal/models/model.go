@@ -29,6 +29,9 @@ const (
 	Running  Status = 1 // 运行中
 	Finish   Status = 2 // 完成
 	Cancel   Status = 3 // 取消
+	Unknown  Status = 4 // 不确定
+	Stopped  Status = 5 //已停止
+	Exited   Status = 6 //异常退出
 )
 
 const (
@@ -70,7 +73,7 @@ func (model *BaseModel) pageLimitOffset() int {
 	return (model.Page - 1) * model.PageSize
 }
 
-// 创建Db
+// CreateDb 创建Db
 func CreateDb() *xorm.Engine {
 	dsn := getDbEngineDSN(app.Setting)
 	engine, err := xorm.NewEngine(app.Setting.Db.Engine, dsn)
@@ -98,7 +101,7 @@ func CreateDb() *xorm.Engine {
 	return engine
 }
 
-// 创建临时数据库连接
+// CreateTmpDb 创建临时数据库连接
 func CreateTmpDb(setting *setting.Setting) (*xorm.Engine, error) {
 	dsn := getDbEngineDSN(setting)
 

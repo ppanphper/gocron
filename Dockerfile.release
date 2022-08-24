@@ -10,8 +10,10 @@ WORKDIR /var/www/gocron
 
 RUN go env -w GO111MODULE=on && \
     go env -w GOPROXY=https://goproxy.cn,direct && \
+    go install github.com/rakyll/statik && \
+    export PATH=${PATH}:$(go env GOPATH)/bin && \
     make install-vue &&  \
-    make build-vue &&  \
+    make build-vue && \
     make statik &&  \
     CGO_ENABLED=0 make gocron
 

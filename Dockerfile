@@ -10,7 +10,6 @@ WORKDIR /app
 
 RUN git clone https://github.com/peng49/gocron.git \
     && cd gocron \
-    && yarn config set ignore-engines true \
     && make install-vue \
     && make build-vue \
     && make statik \

@@ -2,7 +2,7 @@
   <el-card>
       <el-tabs v-model="activeName">
         <el-tab-pane label="Ldap登录认证" name="ldap">
-          <el-form ref="form" :model="ldapSetting" :rules="ldapSettingRules" label-width="100px"
+          <el-form ref="form" :model="ldapSetting" :rules="ldapSettingRules" label-width="120px"
                    style="width: 700px;padding-top: 15px">
             <el-row>
               <el-col :span="6">
@@ -35,9 +35,15 @@
                   <el-input v-model.number="ldapSetting.filterRule"></el-input>
                 </el-form-item>
               </el-col>
+              <el-col :span="24">
+                <el-form-item label="LDAP邮箱属性" prop="filterRule">
+                  <el-input v-model.number="ldapSetting.ldapEmailAttribute"></el-input>
+                </el-form-item>
+              </el-col>
             </el-row>
             <el-form-item>
               <el-button type="primary" @click="ldapSettingSubmit()">提交</el-button>
+              <el-button @click="ldapConnectionTest">LDAP连接测试</el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -61,6 +67,7 @@ export default {
         url: '',
         bindDn: '',
         bindPassword: '',
+        ldapEmailAttribute: '',
         baseDn: 'ou=users,dc=example,dc=com',
         filterRule: '(&(cn={#username}))'
       },
@@ -79,13 +86,13 @@ export default {
       })
       console.log(this.ldapSetting)
     },
+    ldapConnectionTest() {
+
+    },
     renderSetting () {
       let _this = this
       httpClient.get('/system/ldap', {}, function (data) {
         Object.assign(_this.ldapSetting, data)
-
-        // _this.ldapSetting.enable = Boolean(_this.ldapSetting.enable)
-        // console.log(data)
       })
     }
   }

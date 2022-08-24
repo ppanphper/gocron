@@ -308,6 +308,11 @@ func urlAuth(ctx *macaron.Context) {
 //操作日志中间键
 func operateLogMiddleware(resp http.ResponseWriter, req *http.Request, ctx *macaron.Context) {
 	ctx.Next()
+
+	// 不记录GET请求的日志
+	if req.Method == "GET" {
+		return
+	}
 	uri := strings.TrimRight(ctx.Req.URL.Path, "/")
 	type LogData struct {
 		Body   string

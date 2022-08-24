@@ -14,7 +14,11 @@ const router = createRouter({
         },
         {
             path: '/task',
-            name: '任务管理',
+            redirect: '/task/index'
+        },
+        {
+            path: '/task/index',
+            name: '定时任务',
             component: () => import('@/views/task/list')
         },
         {

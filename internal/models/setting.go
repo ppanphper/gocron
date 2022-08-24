@@ -65,6 +65,7 @@ const (
 	LdapKeyBindPassword = "bind-password"
 	LdapKeyBaseDn       = "base-dn"
 	LdapKeyFilterRule   = "filter-rule"
+	LdapEmailAttribute  = "ldap-email-attribute"
 )
 
 // 初始化基本字段 邮件、slack等

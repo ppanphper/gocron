@@ -136,12 +136,13 @@ func LdapSetting(ctx *macaron.Context) string {
 }
 
 type LdapSettingForm struct {
-	Enable       string `form:"enable"`
-	Url          string `form:"url" binding:"Required"`
-	BindDn       string `form:"bindDn" binding:"Required"`
-	BindPassword string `form:"bindPassword" binding:"Required"`
-	BaseDn       string `form:"baseDn" binding:"Required"`
-	FilterRule   string `form:"filterRule" binding:"Required"`
+	Enable             string `form:"enable"`
+	Url                string `form:"url" binding:"Required"`
+	BindDn             string `form:"bindDn" binding:"Required"`
+	BindPassword       string `form:"bindPassword" binding:"Required"`
+	BaseDn             string `form:"baseDn" binding:"Required"`
+	FilterRule         string `form:"filterRule" binding:"Required"`
+	LdapEmailAttribute string `form:"ldapEmailAttribute" binding:"Required"`
 }
 
 func UpdateLdapSetting(ctx *macaron.Context, form LdapSettingForm) string {
@@ -153,6 +154,7 @@ func UpdateLdapSetting(ctx *macaron.Context, form LdapSettingForm) string {
 	_ = settingModel.Set(models.LdapCode, models.LdapKeyBindPassword, form.BindPassword)
 	_ = settingModel.Set(models.LdapCode, models.LdapKeyBaseDn, form.BaseDn)
 	_ = settingModel.Set(models.LdapCode, models.LdapKeyFilterRule, form.FilterRule)
+	_ = settingModel.Set(models.LdapCode, models.LdapEmailAttribute, form.LdapEmailAttribute)
 
 	jsonResp := utils.JsonResponse{}
 	return jsonResp.Success(utils.SuccessContent, nil)

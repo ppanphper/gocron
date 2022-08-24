@@ -20,7 +20,7 @@ let $appConfirm = function (callback) {
 }
 
 let app
-if (window.location.hash.indexOf('/install') > -1) {
+if (window.location.href.endsWith('/#/install')) {
     app = createApp(Install) //直接打开安装页面
 } else {
     app = createApp(App)

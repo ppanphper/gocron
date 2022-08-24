@@ -57,26 +57,17 @@ func (s Server) StartWorker(ctx context.Context, req *pb.StartRequest) (*pb.Star
 	return &pb.StartResponse{Pid: int64(pid)}, err
 }
 
-func (s Server) StopWorker(ctx context.Context, req *pb.PidRequest) (*pb.Response, error) {
+func (s Server) StopWorker(_ context.Context, req *pb.StopRequest) (*pb.StopResponse, error) {
 	err := utils.StopWorker(req.Pid)
 	if err != nil {
-		return &pb.Response{Code: "fail", Message: err.Error()}, err
+		return &pb.StopResponse{Code: "fail", Message: err.Error()}, err
 	}
-	return &pb.Response{Code: "success", Message: "Success"}, nil
+	return &pb.StopResponse{Code: "success", Message: "Success"}, nil
 }
 
-func (s Server) RestartWorker(_ context.Context, req *pb.PidRequest) (*pb.Response, error) {
-	err := utils.StopWorker(req.Pid)
-	if err != nil {
-		return &pb.Response{}, nil
-	}
-	//todo start command
-	return &pb.Response{}, nil
-}
-
-func (s Server) WorkerStateCheck(ctx context.Context, req *pb.PidRequest) (*pb.Response, error) {
-	code, _ := utils.WorkerStateCheck(req.Pid)
-	return &pb.Response{Code: string(code), Message: "Success"}, nil
+func (s Server) WorkerStateCheck(_ context.Context, req *pb.StateRequest) (*pb.StateResponse, error) {
+	state, _ := utils.WorkerStateCheck(req.Pid)
+	return &pb.StateResponse{Code: "success", Message: "Success", State: state}, nil
 }
 
 func Start(addr string, enableTLS bool, certificate auth.Certificate) {

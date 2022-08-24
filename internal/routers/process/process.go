@@ -188,8 +188,11 @@ func Stop(ctx *macaron.Context) string {
 func Restart(ctx *macaron.Context) string {
 	json := utils.JsonResponse{}
 	id := ctx.ParamsInt("id")
-	processModel := models.Process{}
-	_ = processModel.Get(id)
+	process := models.Process{}
+	_ = process.Get(id)
+
+	//关闭所有worker进程,调度器自动重新分配主机启动
+	_ = service.ProcessService.StopProcess(process)
 
 	return json.Success("Success", nil)
 }

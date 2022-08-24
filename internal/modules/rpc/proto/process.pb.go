@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.0
 // 	protoc        v3.21.1
-// source: process.proto
+// source: internal/modules/rpc/proto/process.proto
 
 package rpc
 
@@ -32,7 +32,7 @@ type StartRequest struct {
 func (x *StartRequest) Reset() {
 	*x = StartRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_process_proto_msgTypes[0]
+		mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -45,7 +45,7 @@ func (x *StartRequest) String() string {
 func (*StartRequest) ProtoMessage() {}
 
 func (x *StartRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_process_proto_msgTypes[0]
+	mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *StartRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartRequest.ProtoReflect.Descriptor instead.
 func (*StartRequest) Descriptor() ([]byte, []int) {
-	return file_process_proto_rawDescGZIP(), []int{0}
+	return file_internal_modules_rpc_proto_process_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *StartRequest) GetCommand() string {
@@ -80,13 +80,15 @@ type StartResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Pid int64 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+	Code    string `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Pid     int64  `protobuf:"varint,3,opt,name=pid,proto3" json:"pid,omitempty"`
 }
 
 func (x *StartResponse) Reset() {
 	*x = StartResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_process_proto_msgTypes[1]
+		mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -99,7 +101,7 @@ func (x *StartResponse) String() string {
 func (*StartResponse) ProtoMessage() {}
 
 func (x *StartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_process_proto_msgTypes[1]
+	mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -112,7 +114,21 @@ func (x *StartResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartResponse.ProtoReflect.Descriptor instead.
 func (*StartResponse) Descriptor() ([]byte, []int) {
-	return file_process_proto_rawDescGZIP(), []int{1}
+	return file_internal_modules_rpc_proto_process_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *StartResponse) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *StartResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
 }
 
 func (x *StartResponse) GetPid() int64 {
@@ -122,7 +138,7 @@ func (x *StartResponse) GetPid() int64 {
 	return 0
 }
 
-type PidRequest struct {
+type StopRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -130,23 +146,23 @@ type PidRequest struct {
 	Pid int64 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"` //
 }
 
-func (x *PidRequest) Reset() {
-	*x = PidRequest{}
+func (x *StopRequest) Reset() {
+	*x = StopRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_process_proto_msgTypes[2]
+		mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *PidRequest) String() string {
+func (x *StopRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PidRequest) ProtoMessage() {}
+func (*StopRequest) ProtoMessage() {}
 
-func (x *PidRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_process_proto_msgTypes[2]
+func (x *StopRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -157,19 +173,19 @@ func (x *PidRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PidRequest.ProtoReflect.Descriptor instead.
-func (*PidRequest) Descriptor() ([]byte, []int) {
-	return file_process_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use StopRequest.ProtoReflect.Descriptor instead.
+func (*StopRequest) Descriptor() ([]byte, []int) {
+	return file_internal_modules_rpc_proto_process_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *PidRequest) GetPid() int64 {
+func (x *StopRequest) GetPid() int64 {
 	if x != nil {
 		return x.Pid
 	}
 	return 0
 }
 
-type Response struct {
+type StopResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -178,23 +194,23 @@ type Response struct {
 	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 }
 
-func (x *Response) Reset() {
-	*x = Response{}
+func (x *StopResponse) Reset() {
+	*x = StopResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_process_proto_msgTypes[3]
+		mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *Response) String() string {
+func (x *StopResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Response) ProtoMessage() {}
+func (*StopResponse) ProtoMessage() {}
 
-func (x *Response) ProtoReflect() protoreflect.Message {
-	mi := &file_process_proto_msgTypes[3]
+func (x *StopResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -205,98 +221,218 @@ func (x *Response) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Response.ProtoReflect.Descriptor instead.
-func (*Response) Descriptor() ([]byte, []int) {
-	return file_process_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use StopResponse.ProtoReflect.Descriptor instead.
+func (*StopResponse) Descriptor() ([]byte, []int) {
+	return file_internal_modules_rpc_proto_process_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *Response) GetCode() string {
+func (x *StopResponse) GetCode() string {
 	if x != nil {
 		return x.Code
 	}
 	return ""
 }
 
-func (x *Response) GetMessage() string {
+func (x *StopResponse) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
 	return ""
 }
 
-var File_process_proto protoreflect.FileDescriptor
+type StateRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
 
-var file_process_proto_rawDesc = []byte{
-	0x0a, 0x0d, 0x70, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22,
-	0x42, 0x0a, 0x0c, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
-	0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x07, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x6c, 0x6f, 0x67,
-	0x46, 0x69, 0x6c, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6c, 0x6f, 0x67, 0x46,
-	0x69, 0x6c, 0x65, 0x22, 0x21, 0x0a, 0x0d, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x03, 0x52, 0x03, 0x70, 0x69, 0x64, 0x22, 0x1e, 0x0a, 0x0a, 0x50, 0x69, 0x64, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x03, 0x52, 0x03, 0x70, 0x69, 0x64, 0x22, 0x38, 0x0a, 0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
-	0x32, 0xb2, 0x01, 0x0a, 0x07, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x12, 0x2c, 0x0a, 0x0b,
-	0x53, 0x74, 0x61, 0x72, 0x74, 0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x12, 0x0d, 0x2e, 0x53, 0x74,
-	0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0e, 0x2e, 0x53, 0x74, 0x61,
-	0x72, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x0a, 0x53, 0x74,
-	0x6f, 0x70, 0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x12, 0x0b, 0x2e, 0x50, 0x69, 0x64, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x09, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x27, 0x0a, 0x0d, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x57, 0x6f, 0x72, 0x6b, 0x65,
-	0x72, 0x12, 0x0b, 0x2e, 0x50, 0x69, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x09,
-	0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a, 0x0a, 0x10, 0x57, 0x6f, 0x72,
-	0x6b, 0x65, 0x72, 0x53, 0x74, 0x61, 0x74, 0x65, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x12, 0x0b, 0x2e,
-	0x50, 0x69, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x09, 0x2e, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x08, 0x5a, 0x06, 0x2e, 0x2f, 0x3b, 0x72, 0x70, 0x63, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	Pid int64 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"` //
+}
+
+func (x *StateRequest) Reset() {
+	*x = StateRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StateRequest) ProtoMessage() {}
+
+func (x *StateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StateRequest.ProtoReflect.Descriptor instead.
+func (*StateRequest) Descriptor() ([]byte, []int) {
+	return file_internal_modules_rpc_proto_process_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *StateRequest) GetPid() int64 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+type StateResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Code    string `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	State   string `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
+	Message string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (x *StateResponse) Reset() {
+	*x = StateResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StateResponse) ProtoMessage() {}
+
+func (x *StateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_modules_rpc_proto_process_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StateResponse.ProtoReflect.Descriptor instead.
+func (*StateResponse) Descriptor() ([]byte, []int) {
+	return file_internal_modules_rpc_proto_process_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *StateResponse) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *StateResponse) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
+func (x *StateResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+var File_internal_modules_rpc_proto_process_proto protoreflect.FileDescriptor
+
+var file_internal_modules_rpc_proto_process_proto_rawDesc = []byte{
+	0x0a, 0x28, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c,
+	0x65, 0x73, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x6f,
+	0x63, 0x65, 0x73, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x42, 0x0a, 0x0c, 0x53, 0x74,
+	0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f,
+	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6d,
+	0x6d, 0x61, 0x6e, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x6c, 0x6f, 0x67, 0x46, 0x69, 0x6c, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6c, 0x6f, 0x67, 0x46, 0x69, 0x6c, 0x65, 0x22, 0x4f,
+	0x0a, 0x0d, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63,
+	0x6f, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x10, 0x0a,
+	0x03, 0x70, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x03, 0x70, 0x69, 0x64, 0x22,
+	0x1f, 0x0a, 0x0b, 0x53, 0x74, 0x6f, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10,
+	0x0a, 0x03, 0x70, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x03, 0x70, 0x69, 0x64,
+	0x22, 0x3c, 0x0a, 0x0c, 0x53, 0x74, 0x6f, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x63, 0x6f, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x20,
+	0x0a, 0x0c, 0x53, 0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10,
+	0x0a, 0x03, 0x70, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x03, 0x70, 0x69, 0x64,
+	0x22, 0x53, 0x0a, 0x0d, 0x53, 0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x32, 0x95, 0x01, 0x0a, 0x07, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73,
+	0x73, 0x12, 0x2c, 0x0a, 0x0b, 0x53, 0x74, 0x61, 0x72, 0x74, 0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72,
+	0x12, 0x0d, 0x2e, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x0e, 0x2e, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x29, 0x0a, 0x0a, 0x53, 0x74, 0x6f, 0x70, 0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x12, 0x0c, 0x2e,
+	0x53, 0x74, 0x6f, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0d, 0x2e, 0x53, 0x74,
+	0x6f, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x31, 0x0a, 0x10, 0x57, 0x6f,
+	0x72, 0x6b, 0x65, 0x72, 0x53, 0x74, 0x61, 0x74, 0x65, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x12, 0x0d,
+	0x2e, 0x53, 0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x0e, 0x2e,
+	0x53, 0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x08, 0x5a,
+	0x06, 0x2e, 0x2f, 0x3b, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_process_proto_rawDescOnce sync.Once
-	file_process_proto_rawDescData = file_process_proto_rawDesc
+	file_internal_modules_rpc_proto_process_proto_rawDescOnce sync.Once
+	file_internal_modules_rpc_proto_process_proto_rawDescData = file_internal_modules_rpc_proto_process_proto_rawDesc
 )
 
-func file_process_proto_rawDescGZIP() []byte {
-	file_process_proto_rawDescOnce.Do(func() {
-		file_process_proto_rawDescData = protoimpl.X.CompressGZIP(file_process_proto_rawDescData)
+func file_internal_modules_rpc_proto_process_proto_rawDescGZIP() []byte {
+	file_internal_modules_rpc_proto_process_proto_rawDescOnce.Do(func() {
+		file_internal_modules_rpc_proto_process_proto_rawDescData = protoimpl.X.CompressGZIP(file_internal_modules_rpc_proto_process_proto_rawDescData)
 	})
-	return file_process_proto_rawDescData
+	return file_internal_modules_rpc_proto_process_proto_rawDescData
 }
 
-var file_process_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_process_proto_goTypes = []interface{}{
+var file_internal_modules_rpc_proto_process_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_internal_modules_rpc_proto_process_proto_goTypes = []interface{}{
 	(*StartRequest)(nil),  // 0: StartRequest
 	(*StartResponse)(nil), // 1: StartResponse
-	(*PidRequest)(nil),    // 2: PidRequest
-	(*Response)(nil),      // 3: Response
+	(*StopRequest)(nil),   // 2: StopRequest
+	(*StopResponse)(nil),  // 3: StopResponse
+	(*StateRequest)(nil),  // 4: StateRequest
+	(*StateResponse)(nil), // 5: StateResponse
 }
-var file_process_proto_depIdxs = []int32{
+var file_internal_modules_rpc_proto_process_proto_depIdxs = []int32{
 	0, // 0: Process.StartWorker:input_type -> StartRequest
-	2, // 1: Process.StopWorker:input_type -> PidRequest
-	2, // 2: Process.RestartWorker:input_type -> PidRequest
-	2, // 3: Process.WorkerStateCheck:input_type -> PidRequest
-	1, // 4: Process.StartWorker:output_type -> StartResponse
-	3, // 5: Process.StopWorker:output_type -> Response
-	3, // 6: Process.RestartWorker:output_type -> Response
-	3, // 7: Process.WorkerStateCheck:output_type -> Response
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+	2, // 1: Process.StopWorker:input_type -> StopRequest
+	4, // 2: Process.WorkerStateCheck:input_type -> StateRequest
+	1, // 3: Process.StartWorker:output_type -> StartResponse
+	3, // 4: Process.StopWorker:output_type -> StopResponse
+	5, // 5: Process.WorkerStateCheck:output_type -> StateResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_process_proto_init() }
-func file_process_proto_init() {
-	if File_process_proto != nil {
+func init() { file_internal_modules_rpc_proto_process_proto_init() }
+func file_internal_modules_rpc_proto_process_proto_init() {
+	if File_internal_modules_rpc_proto_process_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_process_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_internal_modules_rpc_proto_process_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StartRequest); i {
 			case 0:
 				return &v.state
@@ -308,7 +444,7 @@ func file_process_proto_init() {
 				return nil
 			}
 		}
-		file_process_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_internal_modules_rpc_proto_process_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StartResponse); i {
 			case 0:
 				return &v.state
@@ -320,8 +456,8 @@ func file_process_proto_init() {
 				return nil
 			}
 		}
-		file_process_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PidRequest); i {
+		file_internal_modules_rpc_proto_process_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StopRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -332,8 +468,32 @@ func file_process_proto_init() {
 				return nil
 			}
 		}
-		file_process_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Response); i {
+		file_internal_modules_rpc_proto_process_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StopResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_internal_modules_rpc_proto_process_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StateRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_internal_modules_rpc_proto_process_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StateResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -349,18 +509,18 @@ func file_process_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_process_proto_rawDesc,
+			RawDescriptor: file_internal_modules_rpc_proto_process_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_process_proto_goTypes,
-		DependencyIndexes: file_process_proto_depIdxs,
-		MessageInfos:      file_process_proto_msgTypes,
+		GoTypes:           file_internal_modules_rpc_proto_process_proto_goTypes,
+		DependencyIndexes: file_internal_modules_rpc_proto_process_proto_depIdxs,
+		MessageInfos:      file_internal_modules_rpc_proto_process_proto_msgTypes,
 	}.Build()
-	File_process_proto = out.File
-	file_process_proto_rawDesc = nil
-	file_process_proto_goTypes = nil
-	file_process_proto_depIdxs = nil
+	File_internal_modules_rpc_proto_process_proto = out.File
+	file_internal_modules_rpc_proto_process_proto_rawDesc = nil
+	file_internal_modules_rpc_proto_process_proto_goTypes = nil
+	file_internal_modules_rpc_proto_process_proto_depIdxs = nil
 }

@@ -98,7 +98,7 @@ func getWorkerState(worker models.ProcessWorker) (string, error) {
 	}
 	addr := fmt.Sprintf("%s:%d", host.Name, host.Port)
 	client, _ := grpcpool.Pool.GetClient(addr)
-	resp, err := client.WorkerStateCheck(context.Background(), &rpc.PidRequest{
+	resp, err := client.WorkerStateCheck(context.Background(), &rpc.StateRequest{
 		Pid: worker.Pid,
 	})
 	if err != nil {
@@ -107,7 +107,7 @@ func getWorkerState(worker models.ProcessWorker) (string, error) {
 		}
 		return "", err
 	}
-	return resp.Code, nil
+	return resp.State, nil
 }
 
 func workerStart(worker models.ProcessWorker) {
@@ -153,7 +153,7 @@ func (p Process) StopWorker(worker models.ProcessWorker) {
 	}
 	addr := fmt.Sprintf("%s:%d", host.Name, host.Port)
 	client, err := grpcpool.Pool.GetClient(addr)
-	req := rpc.PidRequest{
+	req := rpc.StopRequest{
 		Pid: worker.Pid,
 	}
 	resp, _ := client.StopWorker(context.Background(), &req)

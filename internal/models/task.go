@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -276,9 +277,13 @@ func (task *Task) Total(params CommonMap) (int64, error) {
 	return int64(len(list)), err
 }
 
-// GetTaskGroupCountByProject 获取一个月内新增的进程数据
-func (task *Task) GetTaskGroupCountByProject() {
-
+// GetChartDataForDashboard 获取首页折线图需要的新增任务数据
+func (task Task) GetChartDataForDashboard(start time.Time) []ChartNew {
+	charts := make([]ChartNew, 0)
+	_ = Db.
+		SQL(fmt.Sprintf("SELECT t.project_id,p.name AS project_name, from_unixtime(unix_timestamp(t.created), '%s') as week, count(0) as count FROM %stask AS t LEFT JOIN `project` AS `p` ON p.id = t.project_id WHERE t.created > '%s' GROUP BY t.project_id, week", "%Y-%u", TablePrefix, start.Format("2006-01-02"))).
+		Find(&charts)
+	return charts
 }
 
 // 解析where

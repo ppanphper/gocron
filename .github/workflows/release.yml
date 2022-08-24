@@ -11,26 +11,29 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: git fetch --all --tags
+      - name: Fetch Tags
+        run: git fetch --all --tags
 
       - uses: actions/setup-go@v3
         with:
           go-version: '^1.18.0'
-      - run: go version
 
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: |
+
+      - name: Install Vue Cli
+        run: |
           npm -v
           npm install --location=global @vue/cli
-          npm install web/vue/
 
       - name: Build
         run: |
+          go version
           go install github.com/rakyll/statik
           export PATH=${PATH}:$(go env GOPATH)/bin
-          sed -i "s/\r//g" package.sh          
+          sed -i "s/\r//g" package.sh     
+          make install-vue
           make package-all          
 
       - name: Release

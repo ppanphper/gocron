@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.1
-// source: process.proto
+// source: internal/modules/rpc/proto/process.proto
 
 package rpc
 
@@ -23,9 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProcessClient interface {
 	StartWorker(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error)
-	StopWorker(ctx context.Context, in *PidRequest, opts ...grpc.CallOption) (*Response, error)
-	RestartWorker(ctx context.Context, in *PidRequest, opts ...grpc.CallOption) (*Response, error)
-	WorkerStateCheck(ctx context.Context, in *PidRequest, opts ...grpc.CallOption) (*Response, error)
+	StopWorker(ctx context.Context, in *StopRequest, opts ...grpc.CallOption) (*StopResponse, error)
+	WorkerStateCheck(ctx context.Context, in *StateRequest, opts ...grpc.CallOption) (*StateResponse, error)
 }
 
 type processClient struct {
@@ -45,8 +44,8 @@ func (c *processClient) StartWorker(ctx context.Context, in *StartRequest, opts 
 	return out, nil
 }
 
-func (c *processClient) StopWorker(ctx context.Context, in *PidRequest, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
+func (c *processClient) StopWorker(ctx context.Context, in *StopRequest, opts ...grpc.CallOption) (*StopResponse, error) {
+	out := new(StopResponse)
 	err := c.cc.Invoke(ctx, "/Process/StopWorker", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -54,17 +53,8 @@ func (c *processClient) StopWorker(ctx context.Context, in *PidRequest, opts ...
 	return out, nil
 }
 
-func (c *processClient) RestartWorker(ctx context.Context, in *PidRequest, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
-	err := c.cc.Invoke(ctx, "/Process/RestartWorker", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *processClient) WorkerStateCheck(ctx context.Context, in *PidRequest, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
+func (c *processClient) WorkerStateCheck(ctx context.Context, in *StateRequest, opts ...grpc.CallOption) (*StateResponse, error) {
+	out := new(StateResponse)
 	err := c.cc.Invoke(ctx, "/Process/WorkerStateCheck", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -77,9 +67,8 @@ func (c *processClient) WorkerStateCheck(ctx context.Context, in *PidRequest, op
 // for forward compatibility
 type ProcessServer interface {
 	StartWorker(context.Context, *StartRequest) (*StartResponse, error)
-	StopWorker(context.Context, *PidRequest) (*Response, error)
-	RestartWorker(context.Context, *PidRequest) (*Response, error)
-	WorkerStateCheck(context.Context, *PidRequest) (*Response, error)
+	StopWorker(context.Context, *StopRequest) (*StopResponse, error)
+	WorkerStateCheck(context.Context, *StateRequest) (*StateResponse, error)
 }
 
 // UnimplementedProcessServer should be embedded to have forward compatible implementations.
@@ -89,13 +78,10 @@ type UnimplementedProcessServer struct {
 func (UnimplementedProcessServer) StartWorker(context.Context, *StartRequest) (*StartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartWorker not implemented")
 }
-func (UnimplementedProcessServer) StopWorker(context.Context, *PidRequest) (*Response, error) {
+func (UnimplementedProcessServer) StopWorker(context.Context, *StopRequest) (*StopResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StopWorker not implemented")
 }
-func (UnimplementedProcessServer) RestartWorker(context.Context, *PidRequest) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RestartWorker not implemented")
-}
-func (UnimplementedProcessServer) WorkerStateCheck(context.Context, *PidRequest) (*Response, error) {
+func (UnimplementedProcessServer) WorkerStateCheck(context.Context, *StateRequest) (*StateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method WorkerStateCheck not implemented")
 }
 
@@ -129,7 +115,7 @@ func _Process_StartWorker_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Process_StopWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PidRequest)
+	in := new(StopRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -141,31 +127,13 @@ func _Process_StopWorker_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/Process/StopWorker",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProcessServer).StopWorker(ctx, req.(*PidRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Process_RestartWorker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PidRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProcessServer).RestartWorker(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/Process/RestartWorker",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProcessServer).RestartWorker(ctx, req.(*PidRequest))
+		return srv.(ProcessServer).StopWorker(ctx, req.(*StopRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Process_WorkerStateCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PidRequest)
+	in := new(StateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -177,7 +145,7 @@ func _Process_WorkerStateCheck_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/Process/WorkerStateCheck",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProcessServer).WorkerStateCheck(ctx, req.(*PidRequest))
+		return srv.(ProcessServer).WorkerStateCheck(ctx, req.(*StateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -198,14 +166,10 @@ var Process_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Process_StopWorker_Handler,
 		},
 		{
-			MethodName: "RestartWorker",
-			Handler:    _Process_RestartWorker_Handler,
-		},
-		{
 			MethodName: "WorkerStateCheck",
 			Handler:    _Process_WorkerStateCheck_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "process.proto",
+	Metadata: "internal/modules/rpc/proto/process.proto",
 }

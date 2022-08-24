@@ -18,7 +18,7 @@ export default {
     httpClient.post(`/process/stop/${id}`, {}, callback)
   },
   restart (id, callback) {
-    httpClient.post(`/process/stop/${id}`, {}, callback)
+    httpClient.post(`/process/restart/${id}`, {}, callback)
   },
   enable (id, callback) {
     httpClient.instance

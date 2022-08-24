@@ -112,3 +112,25 @@ func FileExist(file string) bool {
 
 	return true
 }
+
+// GetMondayTimes 获取近14周的开始时间
+func GetMondayTimes() []time.Time {
+	weekCount := 13
+	var d int
+	if time.Now().Weekday() == 0 {
+		d = 6
+	} else {
+		d = int(time.Now().Weekday()) - 1
+	}
+
+	//本周周一的开始时间
+	monday, _ := time.Parse("2006-01-02", time.Unix(time.Now().Unix()-int64(d*3600*24), 0).Format("2006-01-02"))
+
+	times := make([]time.Time, 14)
+	//周一之前13周的开始时间
+	start := time.Unix(monday.Unix()-int64(3600*24*7*weekCount), 0)
+	for i := range times {
+		times[i] = time.Unix(start.Unix()+int64(3600*24*7*i), 0)
+	}
+	return times
+}

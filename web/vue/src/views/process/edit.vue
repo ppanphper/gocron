@@ -10,12 +10,12 @@
       <el-row>
         <el-col :span="12">
           <el-form-item label="进程名称" prop="name">
-            <el-input v-model.trim="form.name"></el-input>
+            <el-input v-model="form.name"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="标签">
-            <el-input v-model.trim="form.tag" placeholder="通过标签将进程分组"></el-input>
+            <el-input v-model="form.tag" placeholder="通过标签将进程分组"></el-input>
           </el-form-item>
         </el-col>
       </el-row>

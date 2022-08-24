@@ -1,6 +1,10 @@
 package models
 
-import "github.com/go-xorm/xorm"
+import (
+	"fmt"
+	"github.com/go-xorm/xorm"
+	"time"
+)
 
 type ProcessStatus int8
 
@@ -21,9 +25,17 @@ type Process struct {
 	AuthRestart int8            `json:"auth_restart" xorm:"tinyint notnull default 0"`
 	Enable      bool            `json:"enable" xorm:"tinyint notnull default 1"`
 	LogFile     string          `json:"log_file" xorm:"varchar(256) notnull default"`
+	Created     time.Time       `json:"created" xorm:"datetime notnull created"` // 创建时间
 	Workers     []ProcessWorker `json:"workers" xorm:"-"`
 	Hosts       []Host          `json:"hosts" xorm:"-"`
 	BaseModel   `json:"-" xorm:"-"`
+}
+
+type ChartNew struct {
+	ProjectId   int
+	ProjectName string
+	Week        string
+	Count       int
 }
 
 func (p *Process) Create() (processId int, err error) {
@@ -71,6 +83,14 @@ func (p *Process) List(params CommonMap) ([]Process, error) {
 
 func (p *Process) GetStartWorkerTotal() (int64, error) {
 	return Db.Where("process_id = ? AND state = ?", p.Id, Running).Count(ProcessWorker{})
+}
+
+func (p Process) GetChartDataForDashboard(start time.Time) []ChartNew {
+	charts := make([]ChartNew, 0)
+	_ = Db.
+		SQL(fmt.Sprintf("SELECT p.project_id,project.name AS `project_name`, from_unixtime(unix_timestamp(p.created), '%s') as week, count(0) as count FROM %sprocess AS `p` LEFT JOIN `%sproject` ON `project`.`id` = `p`.`project_id` WHERE p.created > '%s' GROUP BY p.project_id, week", "%Y-%u", TablePrefix, TablePrefix, start.Format("2006-01-02"))).
+		Find(&charts)
+	return charts
 }
 
 // 解析where

@@ -95,7 +95,7 @@
           </template>
         </el-table-column>
         <el-table-column  prop="id" label="ID" width="100" align="center"/>
-        <el-table-column  label="项目">
+        <el-table-column  label="项目" width="180" >
           <template #default="scope">
             {{ projectGroup[scope.row.project_id] ? projectGroup[scope.row.project_id] : '待定' }}
           </template>
@@ -104,7 +104,7 @@
         <el-table-column  prop="command" label="命令" />
         <el-table-column  prop="num_proc" label="进程数" width="80" align="center" />
         <el-table-column  prop="tag" label="标签" />
-        <el-table-column  label="状态">
+        <el-table-column  label="状态" width="100" align="center">
           <template #default="scope">
             <el-tag v-if="scope.row.status === 1" type="success">已启动</el-tag>
             <el-tag v-else-if="scope.row.status === 2" type="info">已停止</el-tag>
@@ -128,6 +128,7 @@
             <el-button type="primary" @click="toEdit(scope.row.id)">编辑</el-button>
             <el-button type="success" v-if="scope.row.status !== 1" @click="start(scope.row.id)">启动</el-button>
             <el-button type="danger" v-if="scope.row.status === 1" @click="stop(scope.row.id)">停止</el-button>
+            <el-button type="warning" v-if="scope.row.status === 1" @click="restart(scope.row.id)">重启</el-button>
           </template>
         </el-table-column>
       </el-table>

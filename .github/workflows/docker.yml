@@ -2,7 +2,8 @@ name: Docker Image Deploy
 
 on:
   push:
-    tags:  [ "v*.*.*" ]
+    branches: [ "develop" ]
+    tags: [ "v*.*.*" ]
 
 jobs:
 
@@ -21,6 +22,7 @@ jobs:
           password: ${{secrets.DOCKER_PASSWORD}}
         run: |
           export appVersion=$(cat cmd/gocron/gocron.go | grep 'AppVersion =' | awk '{print $3}' | sed 's/"//g')
+          echo 'GITHUB_REF:' $GITHUB_REF
           docker tag peng49/gocron:latest "${username}/gocron:v${appVersion}"
           docker images
           echo "${password}" | docker login -u "${username}" --password-stdin

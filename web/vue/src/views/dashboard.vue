@@ -93,6 +93,8 @@ export default {
     return {
       totalGroup: {taskCount: 0, processCount: 0, userCount: 0, projectCount: 0},
       projectTaskChart: null,
+      projectNewX: [],
+      projectNewCharts: [],
       activeUsers: [],
       projectTasks: [],
       projectNewChart: null,
@@ -175,17 +177,17 @@ export default {
         ]
       });
 
-
-      _this.projectNewChart = echarts.init(document.getElementById('project-new-data'));
-      _this.projectNewChart.setOption({
+      //参考 https://blog.51cto.com/u_15127614/3928739 修改2
+      let projectNewChart = echarts.init(document.getElementById('project-new-data'));
+      projectNewChart.setOption({
         title: {
-          text: '30天内系统新增数据'
+          text: '14周内系统新增数据'
         },
         tooltip: {
           trigger: 'axis'
         },
         legend: {
-          data: ['ims新增任务', 'ims新增进程', 'oa新增进程']
+          // data: ['ims新增任务', 'ims新增进程', 'oa新增进程']
         },
         grid: {
           left: '3%',
@@ -201,29 +203,14 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          data: data.projectNewX
         },
         yAxis: {
           type: 'value'
         },
-        series: [
-          {
-            name: 'ims新增任务',
-            type: 'line',
-            data: [1200, 132, 101, 134, 90, 230, 210]
-          },
-          {
-            name: 'ims新增进程',
-            type: 'line',
-            data: [2200, 182, 191, 234, 290, 330, 310]
-          },
-          {
-            name: 'oa新增进程',
-            type: 'line',
-            data: [150, 232, 201, 154, 190, 330, 410]
-          }
-        ]
-      })
+        series: data.projectNewCharts
+      },true)
+      _this.projectTaskChart = projectNewChart
     })
   }
 }

@@ -70,3 +70,8 @@ statik:
 clean:
 	rm bin/gocron
 	rm bin/gocron-node
+
+.PHONY: grpc
+grpc:
+	protoc --go_out=./internal/modules/rpc/proto/ --go-grpc_out=./internal/modules/rpc/proto/ --go-grpc_opt=require_unimplemented_servers=false ./internal/modules/rpc/proto/process.proto
+	protoc --go_out=./internal/modules/rpc/proto/ --go-grpc_out=./internal/modules/rpc/proto/ --go-grpc_opt=require_unimplemented_servers=false ./internal/modules/rpc/proto/task.proto

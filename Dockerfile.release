@@ -29,7 +29,7 @@ WORKDIR /app
 
 COPY --from=builder /var/www/gocron/bin/gocron .
 
-RUN chown -R app:app ./
+RUN mkdir log conf && chown -R app:app ./
 
 EXPOSE 5920
 

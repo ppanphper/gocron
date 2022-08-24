@@ -17,11 +17,12 @@ func (migration *Migration) Install(dbName string) error {
 	task := new(Task)
 	tables := []interface{}{
 		&User{}, task, &TaskLog{}, &Host{}, setting, &LoginLog{}, &TaskHost{},
+		&OperateLog{}, &Process{}, &ProcessHost{}, &ProcessWorker{}, &Project{}, &ProjectHost{},
 	}
 	for _, table := range tables {
 		exist, err := Db.IsTableExist(table)
 		if exist {
-			return errors.New("数据表已存在")
+			return errors.New(fmt.Sprintf("数据表已存在%s", err))
 		}
 		if err != nil {
 			return err
@@ -36,14 +37,14 @@ func (migration *Migration) Install(dbName string) error {
 	return nil
 }
 
-// 迭代升级数据库, 新建表、新增字段等
+// Upgrade 迭代升级数据库, 新建表、新增字段等
 func (migration *Migration) Upgrade(oldVersionId int) {
 	// v1.2版本不支持升级
 	if oldVersionId == 120 {
 		return
 	}
 
-	versionIds := []int{110, 122, 130, 140, 150}
+	versionIds := []int{110, 122, 130, 140, 150, 200}
 	upgradeFuncs := []func(*xorm.Session) error{
 		migration.upgradeFor110,
 		migration.upgradeFor122,

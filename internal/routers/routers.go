@@ -330,9 +330,10 @@ func operateLogMiddleware(resp http.ResponseWriter, req *http.Request, ctx *maca
 	data.Body = body
 	data.Post = req.PostForm
 
-	_, ok := data.Post["password"]
-	if ok {
-		data.Post["password"] = []string{"#hidden#"}
+	for field := range data.Post {
+		if strings.Contains(strings.ToLower(field), "password") {
+			data.Post[field] = []string{"********"}
+		}
 	}
 
 	dataBytes, err := json.Marshal(data)

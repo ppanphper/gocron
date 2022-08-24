@@ -11,7 +11,7 @@ import (
 
 func init() {
 	fmt.Println("setup")
-	app.InitEnv("1.5")
+	app.InitEnv("2.0.0")
 	config, err := setting.Read(app.AppConfig)
 	if err != nil {
 		logger.Fatal("读取应用配置失败", err)
@@ -134,13 +134,4 @@ func TestDashboard(t *testing.T) {
 		}
 		t.Log(data)
 	}
-
-	/**
-	{
-	            name: 'ims新增进程',
-	            type: 'line',
-	            data: [2200, 182, 191, 234, 290, 330, 310]
-	          }
-	*/
-
 }

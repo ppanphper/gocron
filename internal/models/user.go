@@ -12,12 +12,12 @@ type UserSource string
 
 // 用户来源
 const (
-	// System 系统新增
-	System UserSource = "system"
-	// Ldap LDAP登录新增用户
-	Ldap UserSource = "ldap"
-	// Oauth2 Oauth 登录新增用户
-	Oauth2 UserSource = "oauth2"
+	// SourceSystem 系统新增
+	SourceSystem UserSource = "system"
+	// SourceLdap LDAP登录新增用户
+	SourceLdap UserSource = "ldap"
+	// SourceOauth2 Oauth 登录新增用户
+	SourceOauth2 UserSource = "oauth2"
 )
 
 // User 用户model

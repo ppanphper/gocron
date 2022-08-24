@@ -285,13 +285,18 @@ func urlAuth(ctx *macaron.Context) {
 	// 普通用户允许访问的URL地址
 	allowPaths := []string{
 		"",
+		"/dashboard",
 		"/install/status",
+		"/project",
+		"/project/all",
+		"/process",
 		"/task",
 		"/task/log",
 		"/host",
 		"/host/all",
 		"/user/login",
 		"/user/editMyPassword",
+		"/system/setting",
 	}
 	for _, path := range allowPaths {
 		if path == uri {

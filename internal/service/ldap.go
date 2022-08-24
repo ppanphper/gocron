@@ -1,27 +1,31 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-ldap/ldap"
 	"github.com/ouqiang/gocron/internal/models"
-	"github.com/ouqiang/gocron/internal/modules/logger"
 )
 
 type LdapService struct{}
 
-func (ldapService LdapService) Match(username, password string) bool {
+func (LdapService) Match(username, password string) (ldap.Entry, error) {
 	settings := models.Setting{}
 	l, err := ldap.DialURL(settings.Get(models.LdapCode, models.LdapKeyUrl).Value)
 	if err != nil {
-		logger.Debug(err)
-		return false
+		return ldap.Entry{}, err
 	}
 	defer l.Close()
 
 	err = l.Bind(settings.Get(models.LdapCode, models.LdapKeyBindDn).Value, settings.Get(models.LdapCode, models.LdapKeyBindPassword).Value)
 	if err != nil {
-		logger.Debug(err)
-		return false
+		return ldap.Entry{}, err
+	}
+
+	attributes := []string{"dn", "sn"}
+	emailAttribute := settings.Get(models.LdapCode, models.LdapEmailAttribute).Value
+	if emailAttribute != "" {
+		attributes = append(attributes, emailAttribute)
 	}
 
 	req := ldap.NewSearchRequest(
@@ -32,27 +36,34 @@ func (ldapService LdapService) Match(username, password string) bool {
 		0,
 		false,
 		fmt.Sprintf(settings.Get(models.LdapCode, models.LdapKeyFilterRule).Value, username),
-		[]string{"dn"},
+		attributes,
 		nil,
 	)
 
 	sr, err := l.Search(req)
 	if err != nil {
-		logger.Debug(err)
-		return false
+		return ldap.Entry{}, err
 	}
 
 	// 如果没有数据返回或者超过1条数据返回,这对于用户认证而言都是不允许的.
 	// 前这意味着没有查到用户,后者意味着存在重复数据
 	if len(sr.Entries) != 1 {
-		logger.Debug("User does not exist or too many entries returned")
-		return false
+		return ldap.Entry{}, errors.New("user does not exist or too many entries returned")
 	}
 
 	err = l.Bind(sr.Entries[0].DN, password)
 	if err != nil {
-		logger.Debug(err)
-		return false
+		return ldap.Entry{}, err
 	}
-	return true
+
+	return *sr.Entries[0], nil
+}
+
+func (LdapService) GetEntryAttribute(entry ldap.Entry, attributeName string) []string {
+	for _, attribute := range entry.Attributes {
+		if attribute.Name == attributeName {
+			return attribute.Values
+		}
+	}
+	return []string{}
 }

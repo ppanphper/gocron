@@ -232,7 +232,7 @@ func ValidateLogin(ctx *macaron.Context) string {
 	userModel := new(models.User)
 
 	check := userModel.Match(username, password)
-	s := new(models.Setting).Get(models.LdapCode,models.LdapKeyEnable)
+	s := new(models.Setting).Get(models.LdapCode, models.LdapKeyEnable)
 
 	if !check {
 		if s.Value != "1" {
@@ -241,18 +241,34 @@ func ValidateLogin(ctx *macaron.Context) string {
 
 		//ldap校验
 		ldapService := service.LdapService{}
-		if !ldapService.Match(username, password) {
-			return json.CommonFailure("Ldap验证失败")
+		entry, err := ldapService.Match(username, password)
+		if err != nil {
+			return json.CommonFailure("Ldap验证失败", err)
 		}
+		setting := models.Setting{}
+		var email string
+		values := ldapService.GetEntryAttribute(entry, setting.Get(models.LdapCode, models.LdapEmailAttribute).Value)
+		if len(values) > 0 {
+			email = values[0]
+		}
+
+		if email == "" { //如果没有邮箱的话自动生成一个邮箱适配系统
+			email = username + "@example.ldap"
+		}
+
 		//验证用户在系统是否存在
-		b, _ := models.Db.Where("`name` = ?",username).Limit(1).Get(userModel)
+		b, _ := models.Db.Where("`name` = ? or email = ?", username, email).Limit(1).Get(userModel)
 		if !b {
 			//新建用户
 			userModel.Name = username
 			userModel.Password = password
-			userModel.Email = username + "@t.com"
+			userModel.Email = email
+			userModel.Source = models.SourceLdap
 			userModel.IsAdmin = 0
-			_, _ = userModel.Create()
+			_, err = userModel.Create()
+			if err != nil {
+				return json.CommonFailure("Ldap关联系统用户失败", err)
+			}
 		}
 	}
 

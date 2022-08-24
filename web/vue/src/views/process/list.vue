@@ -117,13 +117,14 @@
                 v-model="scope.row.enable"
                 :active-value="true"
                 :inactive-value="false"
+                :disabled="!this.$store.getters.user.isAdmin"
                 @change="changeStatus(scope.row)"
                 active-color="#13ce66"
                 inactive-color="#ff4949">
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" v-if="this.$store.getters.user.isAdmin">
           <template #default="scope">
             <el-button type="primary" @click="toEdit(scope.row.id)">编辑</el-button>
             <el-button type="success" v-if="scope.row.status !== 1" @click="start(scope.row.id)">启动</el-button>

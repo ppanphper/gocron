@@ -13,7 +13,7 @@ import (
 
 func init() {
 	fmt.Println("setup")
-	app.InitEnv("1.5")
+	app.InitEnv("2.0.0")
 	config, err := setting.Read(app.AppConfig)
 	if err != nil {
 		logger.Fatal("读取应用配置失败", err)

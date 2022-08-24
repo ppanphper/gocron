@@ -50,13 +50,13 @@
       </el-icon>
       <span>进程管理</span>
     </el-menu-item>
-    <el-menu-item index="/user/index">
+    <el-menu-item index="/user/index" v-if="this.$store.getters.user.isAdmin">
       <el-icon>
         <UserFilled/>
       </el-icon>
       <span>用户管理</span>
     </el-menu-item>
-    <el-sub-menu index="/system">
+    <el-sub-menu index="/system" v-if="this.$store.getters.user.isAdmin">
       <template #title>
         <el-icon>
           <Management/>

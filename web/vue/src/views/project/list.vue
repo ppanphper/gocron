@@ -43,7 +43,7 @@
       <el-table-column prop="updated_at" :formatter="formatDatetime" label="更新时间"/>
       <el-table-column label="操作">
         <template #default="scope">
-          <el-button type="primary" @click="toEdit(scope.row)">编辑</el-button>
+          <el-button type="primary" v-if="this.$store.getters.user.isAdmin" @click="toEdit(scope.row)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>

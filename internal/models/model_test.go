@@ -93,45 +93,9 @@ func TestTaskLog_Clear(t *testing.T) {
 	t.Log(l.Clear(CommonMap{"taskId": "1"}))
 }
 
-type ChartData struct {
-	Name string
-	Type string
-	Data []int
-}
+func TestUser_Get(t *testing.T) {
+	user := new(User)
+	err := user.Get("ad")
 
-func TestDashboard(t *testing.T) {
-	times := utils.GetMondayTimes()
-
-	for _, time := range times {
-		year, week := time.ISOWeek()
-		t.Log(fmt.Sprintf("%d-%d", year, week))
-	}
-	p := Process{}
-	charts := p.GetChartDataForDashboard(times[0])
-
-	t.Log(charts)
-
-	var maps = make(map[int]map[string]int)
-	for _, chart := range charts {
-		_, ok := maps[chart.ProjectId]
-		if !ok {
-			maps[chart.ProjectId] = make(map[string]int)
-		}
-		maps[chart.ProjectId][chart.Week] = chart.Count
-	}
-
-	for projectId, m := range maps {
-		var data = ChartData{Name: fmt.Sprintf("%d 新增进程", projectId), Type: "line", Data: make([]int, len(times))}
-		for index, d := range times {
-			year, week := d.ISOWeek()
-			s := fmt.Sprintf("%d-%d", year, week)
-			c, ok := m[s]
-			if ok {
-				data.Data[index] = c
-			} else {
-				data.Data[index] = 0
-			}
-		}
-		t.Log(data)
-	}
+	t.Log(err, user.Id)
 }

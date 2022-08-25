@@ -153,7 +153,8 @@ func Register(m *macaron.Macaron) {
 
 		m.Group("/ldap", func() {
 			m.Get("", manage.LdapSetting)
-			m.Post("/update", binding.Bind(manage.LdapSettingForm{}), manage.UpdateLdapSetting)
+			m.Post("/test", binding.Bind(models.LDAPSetting{}), manage.LdapTest)
+			m.Post("/update", manage.UpdateLdapSetting)
 		})
 
 		m.Get("/login-log", loginlog.Index)
@@ -180,7 +181,7 @@ func Register(m *macaron.Macaron) {
 	})
 }
 
-// 中间件注册
+// RegisterMiddleware 中间件注册
 func RegisterMiddleware(m *macaron.Macaron) {
 	m.Use(macaron.Logger())
 	m.Use(macaron.Recovery())
@@ -311,9 +312,8 @@ func urlAuth(ctx *macaron.Context) {
 }
 
 //操作日志中间键
-func operateLogMiddleware(resp http.ResponseWriter, req *http.Request, ctx *macaron.Context) {
+func operateLogMiddleware(req *http.Request, ctx *macaron.Context) {
 	ctx.Next()
-
 	// 不记录GET请求的日志
 	if req.Method == "GET" {
 		return
@@ -326,6 +326,8 @@ func operateLogMiddleware(resp http.ResponseWriter, req *http.Request, ctx *maca
 		Query  map[string]interface{}
 		Header map[string]string
 	}
+
+	//_ = ctx.Req.ParseForm() // 填充Form,PostForm
 
 	data := LogData{Header: map[string]string{}, Query: map[string]interface{}{}}
 	body, err := ctx.Req.Body().String()
@@ -345,6 +347,7 @@ func operateLogMiddleware(resp http.ResponseWriter, req *http.Request, ctx *maca
 	if err != nil {
 		return
 	}
+
 	username := ""
 	_ = user.RestoreToken(ctx)
 	if ctx.Data["username"] != nil {

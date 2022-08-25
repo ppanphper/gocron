@@ -76,13 +76,14 @@ func (user *User) Enable(id int) (int64, error) {
 	return user.Update(id, CommonMap{"status": Enabled})
 }
 
-// Match 验证用户名和密码
-func (user *User) Match(username, password string) bool {
+func (user *User) Get(username string) error {
 	where := "(name = ? OR email = ?) AND status =? "
 	_, err := Db.Where(where, username, username, Enabled).Get(user)
-	if err != nil {
-		return false
-	}
+	return err
+}
+
+// MatchPassword 验证用户密码是否匹配
+func (user *User) MatchPassword(password string) bool {
 	hashPassword := user.encryptPassword(password, user.Salt)
 
 	return hashPassword == user.Password

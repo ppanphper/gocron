@@ -203,11 +203,10 @@ router.afterEach((to, from) => {
     if (to.fullPath === from.fullPath) {
         return
     }
-
-    store.commit('setCurrentPath', to.fullPath === '/' ? '/dashboard' : to.fullPath)
+    store.commit('setCurrentPath', to.path === '/' ? '/dashboard' : to.path)
 
     breadcrumb = []
-    pathResolve(routes, to.fullPath)
+    pathResolve(routes, to.path)
     breadcrumb = breadcrumb.reverse()
     store.commit('setBreadcrumb', breadcrumb)
 })

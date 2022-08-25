@@ -2,8 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"regexp"
-	"strings"
 )
 
 type Setting struct {
@@ -11,6 +9,17 @@ type Setting struct {
 	Code  string `xorm:"varchar(32) notnull"`
 	Key   string `xorm:"varchar(64) notnull"`
 	Value string `xorm:"varchar(4096) notnull default '' "`
+}
+
+// LDAPSetting LDAP设置
+type LDAPSetting struct {
+	Enable             string `json:"enable" form:"enable"`
+	Url                string `json:"url" form:"url" binding:"Required"`
+	BindDn             string `json:"bind_dn" form:"bind_dn" binding:"Required"`
+	BindPassword       string `json:"bind_password" form:"bind_password" binding:"Required"`
+	BaseDn             string `json:"base_dn" form:"base_dn" binding:"Required"`
+	FilterRule         string `json:"filter_rule" form:"filter_rule" binding:"Required"`
+	LdapEmailAttribute string `json:"ldap_email_attribute" form:"ldap_email_attribute" binding:"Required"`
 }
 
 const slackTemplate = `
@@ -58,14 +67,7 @@ const (
 )
 
 const (
-	LdapCode            = "ldap"
-	LdapKeyEnable       = "enable"
-	LdapKeyUrl          = "url"
-	LdapKeyBindDn       = "bind-dn"
-	LdapKeyBindPassword = "bind-password"
-	LdapKeyBaseDn       = "base-dn"
-	LdapKeyFilterRule   = "filter-rule"
-	LdapEmailAttribute  = "ldap-email-attribute"
+	LdapCode = "ldap"
 )
 
 // InitBasicField 初始化基本字段 邮件、slack等
@@ -307,21 +309,20 @@ func (setting *Setting) UpdateWebHook(url, template string) error {
 	return nil
 }
 
-func (setting *Setting) LdapSettings() (map[string]string, error) {
+func (setting *Setting) LdapSettings() (LDAPSetting, error) {
 	var settings []Setting
 	err := Db.AllCols().Where("`code` = ?", LdapCode).Find(&settings)
 
 	var res = make(map[string]string, 0)
-	for _, v := range settings {
-		//re, _ := regexp.Compile("^[a-z]|(-[a-z])")
-		re, _ := regexp.Compile("(-[a-z])")
-
-		key := re.ReplaceAllStringFunc(v.Key, func(s string) string {
-			return strings.Replace(strings.ToUpper(s), "-", "", -1)
-		})
-		res[key] = v.Value
+	for _, s := range settings {
+		res[s.Key] = s.Value
 	}
-	return res, err
+
+	bytes, _ := json.Marshal(res)
+	ldapSetting := LDAPSetting{}
+	_ = json.Unmarshal(bytes, &ldapSetting)
+	
+	return ldapSetting, err
 }
 
 func (setting *Setting) SystemSettings() map[string]string {

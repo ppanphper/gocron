@@ -2,7 +2,10 @@ package manage
 
 import (
 	"encoding/json"
+	"fmt"
+	service2 "github.com/ouqiang/gocron/internal/service"
 	"gopkg.in/macaron.v1"
+	"strings"
 
 	"github.com/ouqiang/gocron/internal/models"
 	"github.com/ouqiang/gocron/internal/modules/logger"
@@ -16,7 +19,6 @@ func Slack(ctx *macaron.Context) string {
 	if err != nil {
 		logger.Error(err)
 		return jsonResp.Success(utils.SuccessContent, nil)
-
 	}
 
 	return jsonResp.Success(utils.SuccessContent, slack)
@@ -127,7 +129,7 @@ func UpdateWebHook(ctx *macaron.Context) string {
 	return utils.JsonResponseByErr(err)
 }
 
-func LdapSetting(ctx *macaron.Context) string {
+func LdapSetting(_ *macaron.Context) string {
 	settingModel := new(models.Setting)
 	settings, _ := settingModel.LdapSettings()
 
@@ -135,26 +137,23 @@ func LdapSetting(ctx *macaron.Context) string {
 	return jsonResp.Success(utils.SuccessContent, settings)
 }
 
-type LdapSettingForm struct {
-	Enable             string `form:"enable"`
-	Url                string `form:"url" binding:"Required"`
-	BindDn             string `form:"bindDn" binding:"Required"`
-	BindPassword       string `form:"bindPassword" binding:"Required"`
-	BaseDn             string `form:"baseDn" binding:"Required"`
-	FilterRule         string `form:"filterRule" binding:"Required"`
-	LdapEmailAttribute string `form:"ldapEmailAttribute" binding:"Required"`
+func LdapTest(ctx *macaron.Context, setting models.LDAPSetting) string {
+	service := service2.LdapService{}
+	entry, err := service.Match(ctx.Req.FormValue("username"), ctx.Req.FormValue("password"), setting)
+
+	if err != nil {
+		return utils.JsonResp.CommonFailure(fmt.Sprintf("连接登录验证失败:%s", err), err)
+	}
+	return utils.JsonResp.Success("Success", entry.DN)
 }
 
-func UpdateLdapSetting(ctx *macaron.Context, form LdapSettingForm) string {
-	settingModel := new(models.Setting)
+func UpdateLdapSetting(ctx *macaron.Context) string {
+	setting := new(models.Setting)
 
-	_ = settingModel.Set(models.LdapCode, models.LdapKeyEnable, form.Enable)
-	_ = settingModel.Set(models.LdapCode, models.LdapKeyUrl, form.Url)
-	_ = settingModel.Set(models.LdapCode, models.LdapKeyBindDn, form.BindDn)
-	_ = settingModel.Set(models.LdapCode, models.LdapKeyBindPassword, form.BindPassword)
-	_ = settingModel.Set(models.LdapCode, models.LdapKeyBaseDn, form.BaseDn)
-	_ = settingModel.Set(models.LdapCode, models.LdapKeyFilterRule, form.FilterRule)
-	_ = settingModel.Set(models.LdapCode, models.LdapEmailAttribute, form.LdapEmailAttribute)
+	_ = ctx.Req.ParseForm()
+	for name, values := range ctx.Req.PostForm {
+		_ = setting.Set(models.LdapCode, name, strings.Join(values, ","))
+	}
 
 	jsonResp := utils.JsonResponse{}
 	return jsonResp.Success(utils.SuccessContent, nil)

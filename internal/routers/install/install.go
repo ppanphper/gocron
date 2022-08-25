@@ -131,6 +131,7 @@ func createAdminUser(form InstallForm) error {
 	user.Name = form.AdminUsername
 	user.Password = form.AdminPassword
 	user.Email = form.AdminEmail
+	user.Source = models.SourceSystem
 	user.IsAdmin = 1
 	_, err := user.Create()
 

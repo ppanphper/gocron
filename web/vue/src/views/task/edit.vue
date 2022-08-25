@@ -465,10 +465,11 @@ export default {
       this.form.remark = taskData.remark
       taskData.hosts = taskData.hosts || []
       if (this.form.protocol === 2) {
-        taskData.hosts.forEach((v) => {
-          this.selectedHosts.push(v.host_id)
+        taskData.hosts.forEach((h) => {
+          this.selectedHosts.push(h.id)
         })
       }
+
       if (this.form.notify_status > 1) {
         const notifyReceiverIds = this.form.notify_receiver_id.split(',')
         if (this.form.notify_type === 2) {

@@ -18,6 +18,7 @@ import (
 )
 
 type Server struct{}
+type ProcessServer struct{}
 
 var keepAlivePolicy = keepalive.EnforcementPolicy{
 	MinTime:             10 * time.Second,
@@ -52,12 +53,12 @@ func (s Server) Run(ctx context.Context, req *pb.TaskRequest) (*pb.TaskResponse,
 }
 
 // StartWorker 开启进程
-func (s Server) StartWorker(ctx context.Context, req *pb.StartRequest) (*pb.StartResponse, error) {
+func (s ProcessServer) StartWorker(ctx context.Context, req *pb.StartRequest) (*pb.StartResponse, error) {
 	pid, err := utils.StartWorker(ctx, req)
 	return &pb.StartResponse{Pid: int64(pid)}, err
 }
 
-func (s Server) StopWorker(_ context.Context, req *pb.StopRequest) (*pb.StopResponse, error) {
+func (s ProcessServer) StopWorker(_ context.Context, req *pb.StopRequest) (*pb.StopResponse, error) {
 	err := utils.StopWorker(req.Pid)
 	if err != nil {
 		return &pb.StopResponse{Code: "fail", Message: err.Error()}, err
@@ -65,7 +66,7 @@ func (s Server) StopWorker(_ context.Context, req *pb.StopRequest) (*pb.StopResp
 	return &pb.StopResponse{Code: "success", Message: "Success"}, nil
 }
 
-func (s Server) WorkerStateCheck(_ context.Context, req *pb.StateRequest) (*pb.StateResponse, error) {
+func (s ProcessServer) WorkerStateCheck(_ context.Context, req *pb.StateRequest) (*pb.StateResponse, error) {
 	state, _ := utils.WorkerStateCheck(req.Pid)
 	return &pb.StateResponse{Code: "success", Message: "Success", State: state}, nil
 }
@@ -89,7 +90,7 @@ func Start(addr string, enableTLS bool, certificate auth.Certificate) {
 	}
 	server := grpc.NewServer(opts...)
 	pb.RegisterTaskServer(server, Server{})
-	pb.RegisterProcessServer(server, Server{})
+	pb.RegisterProcessServer(server, ProcessServer{})
 	log.Infof("server listen on %s", addr)
 
 	go func() {

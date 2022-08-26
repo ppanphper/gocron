@@ -41,7 +41,7 @@ function checkResponseCode(code, msg) {
     switch (code) {
         // 应用未安装
         case APP_NOT_INSTALL_CODE:
-            window.location.href = '/#/install'
+            window.location.href = window.location.origin + '/#/install'
             return false
         // 认证失败
         case AUTH_ERROR_CODE:

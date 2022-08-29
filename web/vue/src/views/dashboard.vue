@@ -117,8 +117,11 @@ export default {
     console.log('mounted')
     dashboardService.get({}, function (data) {
       _this.totalGroup = data.totalGroup
-      _this.projectTaskChart = echarts.init(document.getElementById('project-tasks'));
-      let option = {
+      let taskChartContainer = document.getElementById('project-tasks');
+      let projectTaskChart = echarts.init(taskChartContainer);
+      //https://blog.csdn.net/weixin_53545517/article/details/120865314 处理echarts在vue中切换到其他页面再返回来就不显示的问题
+      taskChartContainer.setAttribute('_echarts_instance_', '')
+      projectTaskChart.setOption({
         title: {
           text: '项目任务数',
           // subtext: '各项目下的任务数量',
@@ -146,8 +149,8 @@ export default {
             }
           }
         ]
-      };
-      _this.projectTaskChart.setOption(option);
+      },true);
+      _this.projectTaskChart = projectTaskChart
 
       _this.userChart = echarts.init(document.getElementById('users-chart'));
       let userX = [], userY = []

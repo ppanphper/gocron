@@ -1,10 +1,13 @@
 package service
 
-import "testing"
+import (
+	"github.com/ouqiang/gocron/internal/models"
+	"testing"
+)
 
 func TestLdapService_Match(t *testing.T) {
 	s := LdapService{}
-	entry, err := s.Match("user01", "123456")
+	entry, err := s.Match("user01", "123456", models.LDAPSetting{})
 
 	t.Log(entry.Attributes, err, s.GetEntryAttribute(entry, "mail"))
 }

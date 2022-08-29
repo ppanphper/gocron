@@ -6,25 +6,11 @@
 # 项目简介
 本项目基于gocron二次开发,在原有定时任务管理的基础上，新增了进程管理模块用于消息队列消费程序的管理，并使用element plus + vue3 重构了前端页面
 
-## 功能特性
-* Web界面管理定时任务
-* crontab时间表达式, 精确到秒
-* 任务执行失败可重试
-* 任务执行超时, 强制结束
-* 任务依赖配置, A任务完成后再执行B任务
-* 账户权限控制
-* 任务类型
-    * shell任务
-    > 在任务节点上执行shell命令, 支持任务同时在多个节点上运行
-    * HTTP任务
-    > 访问指定的URL地址, 由调度器直接执行, 不依赖任务节点
-* 查看任务执行结果日志
-* 任务执行结果通知, 支持邮件、Slack、Webhook
+### 测试地址
+[测试地址](https://gocron-test.fly-develop.com) 
 
-### 截图
-![流程图](https://raw.githubusercontent.com/peng49/gocron/master/assets/screenshot/scheduler.png)
-![任务](https://raw.githubusercontent.com/peng49/gocron/master/assets/screenshot/task.png)
-![Slack](https://raw.githubusercontent.com/peng49/gocron/master/assets/screenshot/notification.png)
+用户名：admin
+密码: admin123
     
 ### 支持平台
 > Windows、Linux、Mac OS
@@ -41,7 +27,7 @@
 ## 安装
 
 ###  二进制安装
-1. 解压压缩包   
+1. 解压压缩包
 2. `cd 解压目录`   
 3. 启动        
 * 调度器启动        
@@ -54,7 +40,7 @@
 
 ### 源码安装
 
-- 安装Go 1.11+
+- 安装Go 1.18+
 - `go get -d github.com/peng49/gocron`
 - `export GO111MODULE=on` 
 - 编译 `make`
@@ -90,7 +76,7 @@ docker run --name gocron --link mysql:db -p 5920:5920 -d peng49/gocron
 `make run` 编译并运行
 
 `make package` 打包 
-> 生成当前系统的压缩包 gocron-v1.5-darwin-amd64.tar.gz gocron-node-v1.5-darwin-amd64.tar.gz
+> 生成当前系统的压缩包 gocron-v2.0.0-darwin-amd64.tar.gz gocron-node-v2.0.0-darwin-amd64.tar.gz
 
 `make package-all` 生成Windows、Linux、Mac的压缩包
 
@@ -126,7 +112,7 @@ docker run --name gocron --link mysql:db -p 5920:5920 -d peng49/gocron
 * Web框架 [Macaron](http://go-macaron.com/)
 * 定时任务调度 [Cron](https://github.com/robfig/cron)
 * ORM [Xorm](https://github.com/go-xorm/xorm)
-* UI框架 [Element UI](https://github.com/ElemeFE/element)
+* UI框架 [Element Plus](https://github.com/element-plus/element-plus)
 * 依赖管理 [Govendor](https://github.com/kardianos/govendor)
 * RPC框架 [gRPC](https://github.com/grpc/grpc)
 

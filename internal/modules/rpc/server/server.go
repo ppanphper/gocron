@@ -59,7 +59,7 @@ func (s ProcessServer) StartWorker(ctx context.Context, req *pb.StartRequest) (*
 }
 
 func (s ProcessServer) StopWorker(_ context.Context, req *pb.StopRequest) (*pb.StopResponse, error) {
-	err := utils.StopWorker(req.Pid)
+	err := utils.StopWorker(int(req.Pid))
 	if err != nil {
 		return &pb.StopResponse{Code: "fail", Message: err.Error()}, err
 	}
@@ -67,7 +67,7 @@ func (s ProcessServer) StopWorker(_ context.Context, req *pb.StopRequest) (*pb.S
 }
 
 func (s ProcessServer) WorkerStateCheck(_ context.Context, req *pb.StateRequest) (*pb.StateResponse, error) {
-	state, _ := utils.WorkerStateCheck(req.Pid)
+	state, _ := utils.WorkerStateCheck(int(req.Pid))
 	return &pb.StateResponse{Code: "success", Message: "Success", State: state}, nil
 }
 

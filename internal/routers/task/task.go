@@ -63,7 +63,7 @@ func Index(ctx *macaron.Context) string {
 		logger.Error(err)
 	}
 	for i, item := range tasks {
-		tasks[i].NextRunTime = service.ServiceTask.NextRunTime(item)
+		tasks[i].NextRunTime = service.TaskService.NextRunTime(item)
 	}
 	jsonResp := utils.JsonResponse{}
 
@@ -220,7 +220,7 @@ func Remove(ctx *macaron.Context) string {
 	taskHostModel := new(models.TaskHost)
 	taskHostModel.Remove(id)
 
-	service.ServiceTask.Remove(id)
+	service.TaskService.Remove(id)
 
 	return json.Success(utils.SuccessContent, nil)
 }
@@ -246,7 +246,7 @@ func Run(ctx *macaron.Context) string {
 	}
 
 	task.Spec = "手动运行"
-	service.ServiceTask.Run(task)
+	service.TaskService.Run(task)
 
 	return json.Success("任务已开始运行, 请到任务日志中查看结果", nil)
 }
@@ -266,7 +266,7 @@ func changeStatus(ctx *macaron.Context, status models.Status) string {
 	if status == models.Enabled {
 		addTaskToTimer(id)
 	} else {
-		service.ServiceTask.Remove(id)
+		service.TaskService.Remove(id)
 	}
 
 	return json.Success(utils.SuccessContent, nil)
@@ -281,7 +281,7 @@ func addTaskToTimer(id int) {
 		return
 	}
 
-	service.ServiceTask.RemoveAndAdd(task)
+	service.TaskService.RemoveAndAdd(task)
 }
 
 // 解析查询参数

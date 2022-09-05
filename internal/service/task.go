@@ -20,9 +20,7 @@ import (
 	pb "github.com/ouqiang/gocron/internal/modules/rpc/proto"
 )
 
-var (
-	ServiceTask Task
-)
+var TaskService Task
 
 var (
 	// 定时任务调度管理器
@@ -419,7 +417,7 @@ func execDependencyTask(taskModel models.Task, taskResult TaskResult) {
 	}
 	for _, task := range tasks {
 		task.Spec = fmt.Sprintf("依赖任务(主任务ID-%d)", taskModel.Id)
-		ServiceTask.Run(task)
+		TaskService.Run(task)
 	}
 }
 

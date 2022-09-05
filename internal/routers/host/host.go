@@ -128,7 +128,7 @@ func Store(ctx *macaron.Context, form HostForm) string {
 		if err != nil {
 			return json.CommonFailure("刷新任务主机信息失败", err)
 		}
-		service.ServiceTask.BatchAdd(tasks)
+		service.TaskService.BatchAdd(tasks)
 	}
 
 	return json.Success("保存成功", nil)

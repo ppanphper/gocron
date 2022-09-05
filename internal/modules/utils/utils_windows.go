@@ -80,17 +80,17 @@ func StartWorker(ctx context.Context, req *rpc.StartRequest) (int, error) {
 }
 
 // StopWorker 通过 pid 停止指定工作进程
-func StopWorker(pid int64) error {
+func StopWorker(pid int) error {
 	state, _ := WorkerStateCheck(pid)
 	if state != Running {
 		return nil
 	}
 	//强制终止此进程及其启动的任何子进程
-	cmd := exec.Command("taskkill", "/PID", strconv.FormatInt(pid, 10), "/T", "/F")
+	cmd := exec.Command("taskkill", "/PID", strconv.Itoa(pid), "/T", "/F")
 	return cmd.Run()
 }
 
-func WorkerStateCheck(pid int64) (string, error) {
+func WorkerStateCheck(pid int) (string, error) {
 	if pid == 0 {
 		return Error, errors.New("pid 不能为0")
 	}

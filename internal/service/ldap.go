@@ -8,9 +8,11 @@ import (
 	"strings"
 )
 
-type LdapService struct{}
+type Ldap struct{}
 
-func (LdapService) Match(username, password string, ldapSetting models.LDAPSetting) (ldap.Entry, error) {
+var LdapService Ldap
+
+func (Ldap) Match(username, password string, ldapSetting models.LDAPSetting) (ldap.Entry, error) {
 	l, err := ldap.DialURL(ldapSetting.Url)
 	if err != nil {
 		return ldap.Entry{}, err
@@ -59,7 +61,7 @@ func (LdapService) Match(username, password string, ldapSetting models.LDAPSetti
 	return *sr.Entries[0], nil
 }
 
-func (LdapService) GetEntryAttribute(entry ldap.Entry, attributeName string) []string {
+func (Ldap) GetEntryAttribute(entry ldap.Entry, attributeName string) []string {
 	for _, attribute := range entry.Attributes {
 		if strings.ToLower(attribute.Name) == strings.ToLower(attributeName) {
 			return attribute.Values
@@ -69,6 +71,6 @@ func (LdapService) GetEntryAttribute(entry ldap.Entry, attributeName string) []s
 }
 
 // Enable LDAP是否可用
-func (LdapService) Enable(ldapSetting models.LDAPSetting) bool {
+func (Ldap) Enable(ldapSetting models.LDAPSetting) bool {
 	return ldapSetting.Enable == "1"
 }

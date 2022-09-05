@@ -6,7 +6,7 @@ type ProcessWorker struct {
 	Id        int64     `json:"id" xorm:"int pk autoincr"`
 	HostId    int       `json:"host_id" xorm:"int host_id"`
 	ProcessId int       `json:"process_id" xorm:"int process_id"`
-	Pid       int64     `json:"pid" xorm:"int pid"`
+	Pid       int       `json:"pid" xorm:"int pid"`
 	IsValid   int8      `json:"is_valid" xorm:"tinyint notnull default 0"`
 	State     Status    `json:"state" xorm:"tinyint notnull default 0"`
 	StartAt   time.Time `json:"start_at" xorm:"datetime notnull created"`

@@ -99,7 +99,7 @@ func getWorkerState(worker models.ProcessWorker) (string, error) {
 	addr := fmt.Sprintf("%s:%d", host.Name, host.Port)
 	client, _ := grpcpool.Pool.GetClient(addr)
 	resp, err := client.WorkerStateCheck(context.Background(), &rpc.StateRequest{
-		Pid: worker.Pid,
+		Pid: int64(worker.Pid),
 	})
 	if err != nil {
 		if status.Code(err) == codes.Unavailable {
@@ -130,7 +130,7 @@ func workerStart(worker models.ProcessWorker) {
 	}
 	resp, err := client.StartWorker(context.Background(), &req)
 	worker.State = models.Running
-	worker.Pid = resp.Pid
+	worker.Pid = int(resp.Pid)
 	_ = worker.Update()
 
 	/*//5秒后确认该进程是否还在还在运行中
@@ -154,7 +154,7 @@ func (p Process) StopWorker(worker models.ProcessWorker) {
 	addr := fmt.Sprintf("%s:%d", host.Name, host.Port)
 	client, err := grpcpool.Pool.GetClient(addr)
 	req := rpc.StopRequest{
-		Pid: worker.Pid,
+		Pid: int64(worker.Pid),
 	}
 	resp, _ := client.StopWorker(context.Background(), &req)
 	if resp.Code == "success" {

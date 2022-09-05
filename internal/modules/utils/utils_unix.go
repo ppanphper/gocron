@@ -21,7 +21,7 @@ type Result struct {
 	err    error
 }
 
-// 执行shell命令，可设置执行超时时间
+// ExecShell 执行shell命令，可设置执行超时时间
 func ExecShell(ctx context.Context, command string) (string, error) {
 	cmd := exec.Command("/bin/bash", "-c", command)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
@@ -43,12 +43,14 @@ func ExecShell(ctx context.Context, command string) (string, error) {
 	}
 }
 
-// 启动一个worker进程
+// StartWorker 启动一个worker进程
 func StartWorker(ctx context.Context, req *rpc.StartRequest) (int, error) {
 	cmd := exec.Command("/bin/bash", "-c", req.Command)
 
+	//		ParentProcess: 1,
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setpgid: true,
+		Setpgid:    true,
+		Credential: &syscall.Credential{Uid: uint32(0), Gid: uint32(0)},
 	}
 
 	if req.LogFile != "" {
@@ -76,17 +78,39 @@ func StartWorker(ctx context.Context, req *rpc.StartRequest) (int, error) {
 	return pid, err
 }
 
-// 通过 pid 停止指定进程
-func StopWorker(pid int64) error {
+// StopWorker 通过 pid 停止指定进程
+func StopWorker(pid int) error {
 	//_ = exec.Command("kill", "-9", strconv.Itoa(int(pid))).Run()
-	process, err := os.FindProcess(int(pid))
+	process, err := os.FindProcess(pid)
 	if err != nil {
 		return err
 	}
 	return process.Kill()
 }
 
-func WorkerStateCheck(pid int64) (string, error) {
+func isRunning(pid int) bool {
+	_, err := os.Stat(fmt.Sprintf("/proc/%d/status", pid))
+	if err != nil {
+		return !os.IsNotExist(err)
+	}
+
+	return true
+}
+
+func getWorkerStateByPs(pid int) {
+
+}
+
+func getWorkerStateByFile(pid int) (string, error) {
+	if isRunning(pid) {
+		// todo 确认是否是僵尸进程
+		return Running, nil
+	} else {
+		return Stop, nil
+	}
+}
+
+func WorkerStateCheck(pid int) (string, error) {
 	if pid == 0 {
 		return Error, errors.New("pid 不能为0")
 	}

@@ -72,5 +72,5 @@ func Store(ctx *macaron.Context, form ProjectForm) string {
 func resetCronTask(projectId int) {
 	t := models.Task{}
 	tasks, _ := t.ActiveListByProjectId(projectId)
-	service.ServiceTask.BatchAdd(tasks)
+	service.TaskService.BatchAdd(tasks)
 }

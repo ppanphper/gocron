@@ -108,7 +108,7 @@ func initModule() {
 	upgradeIfNeed()
 
 	// 初始化定时任务
-	service.ServiceTask.Initialize()
+	service.TaskService.Initialize()
 
 	service.ProcessService.Initialize()
 }
@@ -179,7 +179,7 @@ func shutdown() {
 	logger.Info("应用准备退出")
 	// 停止所有任务调度
 	logger.Info("停止定时任务调度")
-	service.ServiceTask.WaitAndExit()
+	service.TaskService.WaitAndExit()
 }
 
 // 判断应用是否需要升级, 当存在版本号文件且版本小于app.VersionId时升级

@@ -3,7 +3,7 @@ package manage
 import (
 	"encoding/json"
 	"fmt"
-	service2 "github.com/ouqiang/gocron/internal/service"
+	"github.com/ouqiang/gocron/internal/service"
 	"gopkg.in/macaron.v1"
 	"strings"
 
@@ -138,9 +138,8 @@ func LdapSetting(_ *macaron.Context) string {
 }
 
 func LdapTest(ctx *macaron.Context, setting models.LDAPSetting) string {
-	service := service2.LdapService{}
-	entry, err := service.Match(ctx.Req.FormValue("username"), ctx.Req.FormValue("password"), setting)
-
+	entry, err := service.LdapService.Match(ctx.Req.FormValue("username"), ctx.Req.FormValue("password"), setting)
+	
 	if err != nil {
 		return utils.JsonResp.CommonFailure(fmt.Sprintf("连接登录验证失败:%s", err), err)
 	}

@@ -236,7 +236,7 @@ func ValidateLogin(ctx *macaron.Context) string {
 
 	ldapSetting, _ := new(models.Setting).LdapSettings()
 	//ldap校验
-	ldapService := service.LdapService{}
+	ldapService := service.LdapService
 	if (user.Id == 0 || user.Source == models.SourceLdap) && ldapService.Enable(ldapSetting) {
 		//LDAP验证 如果用户通过LDAP关联,则只通过LDAP进行认证，LDAP用户不可用则系统用户自动不可用
 		entry, err := ldapService.Match(username, password, ldapSetting)

@@ -64,7 +64,7 @@ func Stop(ctx *macaron.Context) string {
 		return json.CommonFailure("任务节点列表为空")
 	}
 	for _, host := range task.Hosts {
-		service.ServiceTask.Stop(host.Name, host.Port, id)
+		service.TaskService.Stop(host.Name, host.Port, id)
 
 	}
 

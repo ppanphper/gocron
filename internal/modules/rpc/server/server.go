@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/ouqiang/gocron/internal/modules/logger"
 	"net"
 	"os"
 	"os/signal"
@@ -72,6 +73,11 @@ func (s ProcessServer) WorkerStateCheck(_ context.Context, req *pb.StateRequest)
 }
 
 func Start(addr string, enableTLS bool, certificate auth.Certificate) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("服务崩溃启动异常:", err)
+		}
+	}()
 	l, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatal(err)

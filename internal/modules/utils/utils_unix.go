@@ -6,6 +6,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"github.com/ouqiang/gocron/internal/modules/logger"
 	rpc "github.com/ouqiang/gocron/internal/modules/rpc/proto"
 	"golang.org/x/net/context"
 	"os"
@@ -49,8 +50,7 @@ func StartWorker(ctx context.Context, req *rpc.StartRequest) (int, error) {
 
 	//		ParentProcess: 1,
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setpgid:    true,
-		Credential: &syscall.Credential{Uid: uint32(0), Gid: uint32(0)},
+		Setpgid: true,
 	}
 
 	if req.LogFile != "" {
@@ -73,6 +73,10 @@ func StartWorker(ctx context.Context, req *rpc.StartRequest) (int, error) {
 	}
 
 	err := cmd.Start()
+	if err != nil {
+		logger.Error("进程启动失败:%s", err)
+		return 0, err
+	}
 
 	pid := cmd.Process.Pid
 	return pid, err
@@ -85,7 +89,13 @@ func StopWorker(pid int) error {
 	if err != nil {
 		return err
 	}
-	return process.Kill()
+	err = process.Kill()
+	if err != nil {
+		return err
+	}
+	// 避免产生僵尸进程 https://blog.csdn.net/qq_27068845/article/details/78816995
+	_, err = process.Wait()
+	return err
 }
 
 func isRunning(pid int) bool {

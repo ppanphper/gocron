@@ -41,6 +41,11 @@ func (p Process) Initialize() {
 }
 
 func (p Process) CheckProcessIsStarted(process models.Process) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("panic#service/process.go:CheckProcessIsStarted#", err)
+		}
+	}()
 	var workers []models.ProcessWorker
 	_ = models.Db.Where("process_id = ? AND is_valid = ?", process.Id, 1).Find(&workers)
 	ph := models.ProcessHost{}

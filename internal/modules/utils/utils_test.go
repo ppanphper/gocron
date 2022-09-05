@@ -5,8 +5,10 @@ import (
 	rpc "github.com/ouqiang/gocron/internal/modules/rpc/proto"
 	"golang.org/x/net/context"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -40,7 +42,7 @@ func TestStartWorker(t *testing.T) {
 }
 
 func TestStopWorker(t *testing.T) {
-	err := StopWorker(int64(15780))
+	err := StopWorker(15780)
 	t.Log(err)
 }
 
@@ -61,6 +63,20 @@ func TestBaseDir(t *testing.T) {
 }
 
 func TestWorkerStateCheck(t *testing.T) {
-	str, err := WorkerStateCheck(int64(0))
+	str, err := WorkerStateCheck(0)
 	t.Log("err: ", str, err)
+}
+
+func TestIsRunning(t *testing.T) {
+	running := isRunning(456)
+
+	t.Log(running)
+}
+
+func TestWhichCmd(t *testing.T) {
+	cmd := exec.Command("which", "ps")
+	bytes, err := cmd.CombinedOutput()
+	if err == nil && strings.Contains(string(bytes), "/bin/ps") {
+		t.Log(string(bytes), "===", err)
+	}
 }

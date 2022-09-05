@@ -240,6 +240,7 @@ export default {
     restart (id) {
       processService.restart(id, (data) => {
         console.log(data)
+        this.$message.success('操作成功')
       })
     },
     toEdit (id) {

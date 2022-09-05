@@ -9,10 +9,12 @@ import (
 	"github.com/ouqiang/gocron/internal/modules/logger"
 	rpc "github.com/ouqiang/gocron/internal/modules/rpc/proto"
 	"golang.org/x/net/context"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"syscall"
 )
@@ -45,7 +47,7 @@ func ExecShell(ctx context.Context, command string) (string, error) {
 }
 
 // StartWorker 启动一个worker进程
-func StartWorker(ctx context.Context, req *rpc.StartRequest) (int, error) {
+func StartWorker(_ context.Context, req *rpc.StartRequest) (int, error) {
 	cmd := exec.Command("/bin/bash", "-c", req.Command)
 
 	//		ParentProcess: 1,
@@ -99,46 +101,57 @@ func StopWorker(pid int) error {
 }
 
 func isRunning(pid int) bool {
-	_, err := os.Stat(fmt.Sprintf("/proc/%d/status", pid))
+	pathString := fmt.Sprintf("/proc/%d/status", pid)
+	_, err := os.Stat(pathString)
 	if err != nil {
 		return !os.IsNotExist(err)
 	}
 
-	return true
-}
-
-func getWorkerStateByPs(pid int) {
-
-}
-
-func getWorkerStateByFile(pid int) (string, error) {
-	if isRunning(pid) {
-		// todo 确认是否是僵尸进程
-		return Running, nil
-	} else {
-		return Stop, nil
+	content, err := ioutil.ReadFile(pathString)
+	if err != nil {
+		return false
 	}
+	regex, _ := regexp.Compile("State:.*")
+	str := regex.Find(content)
+	if strings.Contains(strings.ToLower(string(str)), "zombie") {
+		// 僵尸进程
+		return false
+	}
+
+	return true
 }
 
 func WorkerStateCheck(pid int) (string, error) {
 	if pid == 0 {
 		return Error, errors.New("pid 不能为0")
 	}
-	cmd := exec.Command("ps", "-p", fmt.Sprintf("%d", pid))
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return Stop, err
+	cmd := exec.Command("which", "ps")
+	bytes, err := cmd.CombinedOutput()
+	if err == nil && strings.Contains(string(bytes), "/bin/ps") {
+		// 使用PS命令校验
+		cmd := exec.Command("ps", "-p", fmt.Sprintf("%d", pid))
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return Stop, err
+		}
+		rows := strings.Split(string(output), "\n")
+		if len(rows) < 2 { //异常
+			return Stop, errors.New(fmt.Sprintf("output exception,process %d not found", pid))
+		}
+		if strings.Contains(rows[1], "<defunct>") {
+			//僵尸进程
+			return Stop, errors.New(fmt.Sprintf("process %d is zombie", pid))
+		}
+		if !strings.Contains(rows[1], fmt.Sprintf("%d", pid)) {
+			return Stop, errors.New(fmt.Sprintf("process %d not found", pid))
+		}
+		return Running, nil
+	} else {
+		// 通过文件校验
+		if isRunning(pid) {
+			return Running, nil
+		} else {
+			return Stop, nil
+		}
 	}
-	rows := strings.Split(string(output), "\n")
-	if len(rows) < 2 { //异常
-		return Stop, errors.New(fmt.Sprintf("output exception,process %d not found", pid))
-	}
-	if strings.Contains(rows[1], "<defunct>") {
-		//僵尸进程
-		return Stop, errors.New(fmt.Sprintf("process %d is zombie", pid))
-	}
-	if !strings.Contains(rows[1], fmt.Sprintf("%d", pid)) {
-		return Stop, errors.New(fmt.Sprintf("process %d not found", pid))
-	}
-	return Running, nil
 }

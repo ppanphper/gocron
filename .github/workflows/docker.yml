@@ -27,3 +27,4 @@ jobs:
           docker images
           echo "${password}" | docker login -u "${username}" --password-stdin
           docker push "${username}/gocron:latest"
+          docker push "${username}/gocron:v${appVersion}"

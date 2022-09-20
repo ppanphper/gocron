@@ -30,7 +30,7 @@ func TestCreateTable(t *testing.T) {
 }
 
 func TestAlertTable(t *testing.T) {
-	results, err := Db.Query("alter table `task` add project_id int default 0 not null;")
+	results, err := Db.Query("alter table task add project_id int default 0 not null;")
 	t.Log(results, err)
 }
 

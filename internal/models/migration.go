@@ -272,8 +272,8 @@ func (m *Migration) upgradeFor200(session *xorm.Session) error {
 		return err
 	}
 
-	_, err = session.Query(fmt.Sprintf("alter table `%stask` add project_id int default 0 not null;", TablePrefix))
-	_, err = session.Query(fmt.Sprintf("alter table `%suser` add source varchar(16) default 'system' not null after email;", TablePrefix))
+	_, err = session.Query(fmt.Sprintf("alter table %stask add project_id int default 0 not null;", TablePrefix))
+	_, err = session.Query(fmt.Sprintf("alter table %suser add source varchar(16) default 'system' not null after email;", TablePrefix))
 	if err != nil {
 		logger.Info("升级到v2.0.0失败\n", err)
 		return err

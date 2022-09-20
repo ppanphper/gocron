@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type OperateLog struct {
 	Id         int       `json:"id" xorm:"pk autoincr notnull "`
@@ -31,7 +34,8 @@ func (log *OperateLog) Create() (insertId int, err error) {
 
 // GetActiveUsers 获取30天内最活跃用户12名用户
 func (log *OperateLog) GetActiveUsers() ([]ActiveUser, error) {
+	date := time.Unix(time.Now().Unix()-3600*24*30, 0).Format("2006-01-02")
 	var users = make([]ActiveUser, 0)
-	err := Db.SQL("SELECT username, count(0) AS `count` FROM `operate_log` WHERE `created` > DATE_SUB(NOW(), INTERVAL 30 DAY) AND `username` != '' GROUP BY username ORDER BY `count` DESC LIMIT 12").Find(&users)
+	err := Db.SQL(fmt.Sprintf("SELECT username, count(0) AS count FROM operate_log WHERE created > '%s' AND username != '' GROUP BY username ORDER BY count DESC LIMIT 12", date)).Find(&users)
 	return users, err
 }

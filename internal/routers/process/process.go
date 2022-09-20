@@ -77,7 +77,7 @@ func Store(_ *macaron.Context, form Form) string {
 	if workerCount < form.NumProc { //新增worker
 		newCount := form.NumProc - workerCount
 		for i := 0; i < newCount; i++ {
-			pw = models.ProcessWorker{ProcessId: processModel.Id, IsValid: 1}
+			pw = models.ProcessWorker{ProcessId: processModel.Id, IsValid: 1, State: 0}
 			err = pw.Create()
 			fmt.Println(err)
 		}
@@ -125,7 +125,7 @@ func Start(ctx *macaron.Context) string {
 	process := models.Process{}
 	_ = process.Get(id)
 
-	if !process.Enable {
+	if process.Enable != 1 {
 		return utils.JsonResp.CommonFailure("进程不可用，请先启动进程", nil)
 	}
 
@@ -145,7 +145,7 @@ func Enable(ctx *macaron.Context) string {
 	if err != nil {
 		return json.CommonFailure("获取进程失败", err)
 	}
-	_, err = process.Update(processId, models.CommonMap{"enable": true})
+	_, err = process.Update(processId, models.CommonMap{"enable": 1})
 	if err != nil {
 		return json.CommonFailure("更新数据失败", err)
 	}
@@ -165,7 +165,7 @@ func Disable(ctx *macaron.Context) string {
 		return json.CommonFailure("进程存在运行中的工作进程,不能禁用,请先停止进程", err)
 	}
 
-	_, err = process.Update(processId, models.CommonMap{"enable": false})
+	_, err = process.Update(processId, models.CommonMap{"enable": 0})
 	if err != nil {
 		return json.CommonFailure("更新数据失败", err)
 	}

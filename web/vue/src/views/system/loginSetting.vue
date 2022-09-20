@@ -12,12 +12,12 @@
             </el-col>
             <el-col :span="24">
               <el-form-item label="Url" prop="url" required>
-                <el-input v-model="ldapSetting.url"></el-input>
+                <el-input v-model="ldapSetting.url" placeholder="服务器链接,如：ldap://127.0.0.1:389"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24">
               <el-form-item label="绑定DN" prop="bind_dn" required>
-                <el-input v-model="ldapSetting.bind_dn"></el-input>
+                <el-input v-model="ldapSetting.bind_dn" placeholder="绑定DN,如：cn=admin,ou=users,dc=example,dc=com"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24">
@@ -27,7 +27,7 @@
             </el-col>
             <el-col :span="24">
               <el-form-item label="筛选范围" prop="base_dn" required>
-                <el-input v-model.number="ldapSetting.base_dn"></el-input>
+                <el-input v-model.number="ldapSetting.base_dn" placeholder="筛选范围,如：ou=users,dc=example,dc=com"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="24">
@@ -37,7 +37,7 @@
             </el-col>
             <el-col :span="24">
               <el-form-item label="LDAP邮箱属性" prop="ldap_email_attribute" required>
-                <el-input v-model.number="ldapSetting.ldap_email_attribute"></el-input>
+                <el-input v-model.number="ldapSetting.ldap_email_attribute" placeholder="LDAP邮箱属性,如：email"></el-input>
               </el-form-item>
             </el-col>
           </el-row>

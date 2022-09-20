@@ -115,8 +115,8 @@
           <template #default="scope">
             <el-switch
                 v-model="scope.row.enable"
-                :active-value="true"
-                :inactive-value="false"
+                :active-value="1"
+                :inactive-value="0"
                 :disabled="!this.$store.getters.user.isAdmin"
                 @change="changeStatus(scope.row)"
                 active-color="#13ce66"

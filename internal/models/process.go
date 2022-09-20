@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"github.com/go-xorm/xorm"
+	"github.com/ouqiang/gocron/internal/modules/app"
 	"time"
 )
 
@@ -23,7 +24,7 @@ type Process struct {
 	NumProc     int             `json:"num_proc" xorm:"tinyint notnull default 1"`
 	AutoStart   int8            `json:"auto_start" xorm:"tinyint notnull default 0"`
 	AuthRestart int8            `json:"auth_restart" xorm:"tinyint notnull default 0"`
-	Enable      bool            `json:"enable" xorm:"tinyint notnull default 1"`
+	Enable      int8            `json:"enable" xorm:"tinyint notnull default 1"`
 	LogFile     string          `json:"log_file" xorm:"varchar(256) notnull default"`
 	Created     time.Time       `json:"created" xorm:"datetime notnull created"` // 创建时间
 	Workers     []ProcessWorker `json:"workers" xorm:"-"`
@@ -87,9 +88,15 @@ func (p *Process) GetStartWorkerTotal() (int64, error) {
 
 func (p Process) GetChartDataForDashboard(start time.Time) []ChartNew {
 	charts := make([]ChartNew, 0)
-	_ = Db.
-		SQL(fmt.Sprintf("SELECT p.project_id,project.name AS `project_name`, from_unixtime(unix_timestamp(p.created), '%s') as week, count(0) as count FROM %sprocess AS `p` LEFT JOIN `%sproject` ON `project`.`id` = `p`.`project_id` WHERE p.created > '%s' GROUP BY p.project_id, week", "%Y-%u", TablePrefix, TablePrefix, start.Format("2006-01-02"))).
-		Find(&charts)
+	var sql string
+	switch app.Setting.Db.Engine {
+	case "postgres":
+		sql = fmt.Sprintf("SELECT p.project_id,project.name AS project_name, to_char(p.created,'IYYY-IW') as week, count(0) as count FROM %sprocess AS `p` LEFT JOIN `%sproject` ON `project`.`id` = `p`.`project_id` WHERE p.created > '%s' GROUP BY p.project_id,project_name,week", TablePrefix, TablePrefix, start.Format("2006-01-02"))
+	default:
+		//默认mysql
+		sql = fmt.Sprintf("SELECT p.project_id,project.name AS `project_name`, from_unixtime(unix_timestamp(p.created), '%s') as week, count(0) as count FROM %sprocess AS `p` LEFT JOIN `%sproject` ON `project`.`id` = `p`.`project_id` WHERE p.created > '%s' GROUP BY p.project_id, week", "%Y-%u", TablePrefix, TablePrefix, start.Format("2006-01-02"))
+	}
+	_ = Db.SQL(sql).Find(&charts)
 	return charts
 }
 

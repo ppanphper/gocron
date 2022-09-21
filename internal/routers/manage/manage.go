@@ -3,8 +3,10 @@ package manage
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ouqiang/gocron/internal/modules/app"
 	"github.com/ouqiang/gocron/internal/service"
 	"gopkg.in/macaron.v1"
+	"strconv"
 	"strings"
 
 	"github.com/ouqiang/gocron/internal/models"
@@ -139,7 +141,7 @@ func LdapSetting(_ *macaron.Context) string {
 
 func LdapTest(ctx *macaron.Context, setting models.LDAPSetting) string {
 	entry, err := service.LdapService.Match(ctx.Req.FormValue("username"), ctx.Req.FormValue("password"), setting)
-	
+
 	if err != nil {
 		return utils.JsonResp.CommonFailure(fmt.Sprintf("连接登录验证失败:%s", err), err)
 	}
@@ -169,7 +171,9 @@ func UpdateSystemSetting(ctx *macaron.Context) string {
 
 func GetSystemSetting() string {
 	s := new(models.Setting)
-	return utils.JsonResp.Success(utils.SuccessContent, s.SystemSettings())
+	settings := s.SystemSettings()
+	settings["versionId"] = strconv.Itoa(app.GetCurrentVersionId())
+	return utils.JsonResp.Success(utils.SuccessContent, settings)
 }
 
 // endregion

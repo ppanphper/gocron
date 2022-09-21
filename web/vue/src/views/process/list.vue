@@ -172,6 +172,14 @@ export default {
         _this.projectGroup[p.id] = p.name
       })
     })
+
+    //每10秒刷新一次页面,获取worker的最新状态
+    _this.timer = setInterval(() => {
+      _this.search()
+    }, 10000)
+  },
+  beforeUnmount() {
+    clearInterval(this.timer)
   },
   methods: {
     formatDatetime: format.formatDatetime,
@@ -225,22 +233,21 @@ export default {
       }
     },
     start (id) {
-      processService.start(id, (data) => {
-        console.log(data)
+      processService.start(id, () => {
         this.$message.success('程序已启动')
         this.search()
       })
     },
     stop (id) {
-      processService.stop(id, (data) => {
-        console.log(data)
+      processService.stop(id, () => {
         this.$message.success('程序已停止')
+        this.search()
       })
     },
     restart (id) {
-      processService.restart(id, (data) => {
-        console.log(data)
+      processService.restart(id, () => {
         this.$message.success('操作成功')
+        this.search()
       })
     },
     toEdit (id) {
@@ -251,9 +258,6 @@ export default {
         path = `/process/edit/${id}`
       }
       this.$router.push(path)
-    },
-    refresh () {
-
     }
   }
 }

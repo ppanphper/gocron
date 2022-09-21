@@ -4,7 +4,8 @@
 [![Release](https://img.shields.io/github/release/peng49/gocron.svg?label=Release)](https://github.com/peng49/gocron/releases)
 
 # 项目简介
-本项目基于gocron二次开发,在原有定时任务管理的基础上，新增了进程管理模块用于消息队列消费程序的管理，并使用element plus + vue3 重构了前端页面
+
+本项目基于 [ouqiang/gocron](https://github.com/ouqiang/gocron),在原有的定时任务管理的基础上,新增的进程管理模块,LDAP用户认证功能,新增了项目管理功能用来对主机和任务进行分组管理,并使用 Element Plus + Vue3 重构了前端页面
 
 ### 测试地址
 [测试地址](https://gocron-test.fly-develop.com) 
@@ -76,7 +77,7 @@ docker run --name gocron --link mysql:db -p 5920:5920 -d peng49/gocron
 `make run` 编译并运行
 
 `make package` 打包 
-> 生成当前系统的压缩包 gocron-v2.0.0-darwin-amd64.tar.gz gocron-node-v2.0.0-darwin-amd64.tar.gz
+> 生成当前系统的压缩包 gocron-v2.x.x-darwin-amd64.tar.gz gocron-node-v2.x.x-darwin-amd64.tar.gz
 
 `make package-all` 生成Windows、Linux、Mac的压缩包
 
@@ -94,19 +95,11 @@ docker run --name gocron --link mysql:db -p 5920:5920 -d peng49/gocron
     * -allow-root *nix平台允许以root用户运行
     * -s ip:port 监听地址  
     * -enable-tls 开启TLS    
-    * -ca-file   CA证书文件   
+    * -ca-file CA证书文件 
     * -cert-file 证书文件  
     * -key-file  私钥文件
     * -h 查看帮助
     * -v 查看版本
-
-## To Do List
-- [x] 版本升级
-- [x] 批量开启、关闭、删除任务
-- [x] 调度器与任务节点通信支持https
-- [x] 任务分组
-- [x] 多用户
-- [x] 权限控制
 
 ## 程序使用的组件
 * Web框架 [Macaron](http://go-macaron.com/)

@@ -38,7 +38,7 @@ func TestStartProcess(t *testing.T) {
 	req := rpc.StartRequest{
 		Command: "php process.php",
 	}
-	resp, err := client.StartProcess(context.Background(), &req)
+	resp, err := client.StartWorker(context.Background(), &req)
 	if err != nil {
 		t.Fatal(err)
 	}

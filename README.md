@@ -7,11 +7,19 @@
 
 本项目基于 [ouqiang/gocron](https://github.com/ouqiang/gocron),在原有的定时任务管理的基础上,新增的进程管理模块,LDAP用户认证功能,新增了项目管理功能用来对主机和任务进行分组管理,并使用 Element Plus + Vue3 重构了前端页面
 
+### 部分截图
+![dashboard.jpg](https://s2.loli.net/2022/09/22/itsfQZVYM3BnwK5.jpg)
+![tasks.jpg](https://s2.loli.net/2022/09/22/KkltuZFbRfrD1ic.jpg)
+![process.jpg](https://s2.loli.net/2022/09/22/RzlSo3YVyQAgCuf.jpg)
+![ldap.jpg](https://s2.loli.net/2022/09/22/k4ctQJr3nZ6YFxm.jpg)
+
 ### 测试地址
 [测试地址](https://gocron-test.fly-develop.com) 
 
 用户名：admin
 密码: admin123
+
+
     
 ### 支持平台
 > Windows、Linux、Mac OS

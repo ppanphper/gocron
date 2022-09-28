@@ -85,9 +85,19 @@
                     <el-tag v-else>未知状态 {{ scope.row.state }}</el-tag>
                   </template>
                 </el-table-column>
+                <el-table-column label="创建时间">
+                  <template #default="scope">
+                    {{ formatDatetime(scope.row.created_at) }}
+                  </template>
+                </el-table-column>
                 <el-table-column label="启动时间">
                   <template #default="scope">
                     {{ formatDatetime(scope.row.start_at) }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="最后检测时间">
+                  <template #default="scope">
+                    {{ formatDatetime(scope.row.last_check_at) }}
                   </template>
                 </el-table-column>
               </el-table>

@@ -59,7 +59,7 @@
       <el-form-item label="项目编码" prop="code" required>
         <el-input v-model="editForm.code"/>
       </el-form-item>
-      <el-form-item label="主机" prop="host_ids">
+      <el-form-item label="项目节点" prop="host_ids">
         <el-select v-model="editForm.host_ids" placeholder="请选择关联节点" multiple style="width:100%">
           <el-option
               v-for="host in hosts"

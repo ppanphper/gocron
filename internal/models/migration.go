@@ -44,7 +44,7 @@ func (migration *Migration) Upgrade(oldVersionId int) {
 		return
 	}
 
-	versionIds := []int{110, 122, 130, 140, 150, 200}
+	versionIds := []int{110, 122, 130, 140, 150, 200, 203}
 	upgradeFuncs := []func(*xorm.Session) error{
 		migration.upgradeFor110,
 		migration.upgradeFor122,
@@ -52,6 +52,7 @@ func (migration *Migration) Upgrade(oldVersionId int) {
 		migration.upgradeFor140,
 		migration.upgradeFor150,
 		migration.upgradeFor200,
+		migration.upgradeFor203,
 	}
 
 	startIndex := -1
@@ -272,8 +273,13 @@ func (m *Migration) upgradeFor200(session *xorm.Session) error {
 		return err
 	}
 
-	_, err = session.Query(fmt.Sprintf("alter table %stask add project_id int default 0 not null;", TablePrefix))
-	_, err = session.Query(fmt.Sprintf("alter table %suser add source varchar(16) default 'system' not null after email;", TablePrefix))
+	err = session.Sync2(new(Task))
+	if err != nil {
+		logger.Info("升级到v2.0.0失败\n", err)
+		return err
+	}
+
+	err = session.Sync2(new(User))
 	if err != nil {
 		logger.Info("升级到v2.0.0失败\n", err)
 		return err
@@ -284,5 +290,14 @@ func (m *Migration) upgradeFor200(session *xorm.Session) error {
 	_ = s.Set("system", "title", "gocron")
 
 	logger.Info("已升级到v2.0.0\n")
+	return err
+}
+
+func (m *Migration) upgradeFor203(session *xorm.Session) error {
+	logger.Info("开始升级到v2.0.3")
+	
+	err := session.Sync2(new(ProcessWorker))
+
+	logger.Info("已升级到v2.0.3\n")
 	return err
 }

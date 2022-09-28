@@ -31,11 +31,6 @@ func (p Process) Initialize() {
 			}
 
 			//todo 检测所有停止状态的进程是否有在运行中的
-			/*var workers []models.ProcessWorker
-			_ = models.Db.Where("is_valid = ?", 1).Find(&workers)
-			for _, worker := range workers {
-				go checkWorkerState(worker)
-			}*/
 		}
 	}(ticker)
 }
@@ -61,6 +56,7 @@ func (p Process) CheckProcessIsStarted(process models.Process) {
 	index := 0
 	for _, worker := range workers {
 		host := hosts[index]
+		// 确认worker的执行主机
 		if worker.HostId == 0 || worker.State == models.Stopped {
 			worker.HostId = host.Id
 			_ = worker.Update()
@@ -69,9 +65,12 @@ func (p Process) CheckProcessIsStarted(process models.Process) {
 				index = 0
 			}
 		}
+
+		// 检测worker是否在运行中
 		if worker.Pid == 0 {
-			workerStart(worker)
-			_ = worker.SetState(models.Running)
+			worker.LastCheckAt = time.Now()
+			workerStart(&worker)
+			_ = worker.Update()
 		} else {
 			p.CheckWorkerIsRunning(worker)
 		}
@@ -80,19 +79,21 @@ func (p Process) CheckProcessIsStarted(process models.Process) {
 
 func (p Process) CheckWorkerIsRunning(worker models.ProcessWorker) {
 	state, err := getWorkerState(worker)
-	if status.Code(err) == codes.Unavailable {
-		//服务不可用
-		logger.Info("服务不可用")
-		_ = worker.SetState(models.Unknown)
-		return
-	}
+	worker.LastCheckAt = time.Now()
 	if err != nil {
+		if status.Code(err) == codes.Unavailable {
+			//服务不可用
+			logger.Info("服务不可用")
+			worker.State = models.Unknown
+		}
+		_ = worker.Update()
 		return
 	}
+
 	if state != utils.Running {
-		workerStart(worker)
-		_ = worker.SetState(models.Running)
+		workerStart(&worker)
 	}
+	_ = worker.Update()
 }
 
 func getWorkerState(worker models.ProcessWorker) (string, error) {
@@ -115,7 +116,7 @@ func getWorkerState(worker models.ProcessWorker) (string, error) {
 	return resp.State, nil
 }
 
-func workerStart(worker models.ProcessWorker) {
+func workerStart(worker *models.ProcessWorker) {
 	logger.Debug("workerStart running")
 	host := models.Host{}
 	err := host.Find(worker.HostId)
@@ -136,13 +137,6 @@ func workerStart(worker models.ProcessWorker) {
 	resp, err := client.StartWorker(context.Background(), &req)
 	worker.State = models.Running
 	worker.Pid = int(resp.Pid)
-	_ = worker.Update()
-
-	/*//5秒后确认该进程是否还在还在运行中
-	time.AfterFunc(time.Second*5, func() {
-		checkWorkerState(worker)
-		logger.Debug(fmt.Sprintf("%d is running", worker.Pid))
-	})*/
 }
 
 func (p Process) StopWorker(worker models.ProcessWorker) {

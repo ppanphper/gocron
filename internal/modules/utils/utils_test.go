@@ -63,14 +63,14 @@ func TestBaseDir(t *testing.T) {
 }
 
 func TestWorkerStateCheck(t *testing.T) {
-	str, err := WorkerStateCheck(0)
+	str, err := WorkerStateCheck(236)
 	t.Log("err: ", str, err)
 }
 
 func TestIsRunning(t *testing.T) {
-	running := isRunning(456)
-
-	t.Log(running)
+	//running := isRunning(456)
+	//
+	//t.Log(running)
 }
 
 func TestWhichCmd(t *testing.T) {

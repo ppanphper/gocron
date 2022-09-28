@@ -3,14 +3,16 @@ package models
 import "time"
 
 type ProcessWorker struct {
-	Id        int64     `json:"id" xorm:"int pk autoincr"`
-	HostId    int       `json:"host_id" xorm:"int host_id"`
-	ProcessId int       `json:"process_id" xorm:"int process_id"`
-	Pid       int       `json:"pid" xorm:"int pid"`
-	IsValid   int8      `json:"is_valid" xorm:"tinyint notnull default 0"`
-	State     Status    `json:"state" xorm:"tinyint notnull default 0"`
-	StartAt   time.Time `json:"start_at" xorm:"datetime notnull created"`
-	BaseModel `json:"-" xorm:"-"`
+	Id          int64     `json:"id" xorm:"int pk autoincr"`
+	HostId      int       `json:"host_id" xorm:"int host_id"`
+	ProcessId   int       `json:"process_id" xorm:"int process_id"`
+	Pid         int       `json:"pid" xorm:"int pid"`
+	IsValid     int8      `json:"is_valid" xorm:"tinyint notnull default 0"`
+	State       Status    `json:"state" xorm:"tinyint notnull default 0"`
+	CreatedAt   time.Time `json:"created_at" xorm:"datetime notnull default current_timestamp created"`
+	StartAt     time.Time `json:"start_at" xorm:"datetime notnull"`
+	LastCheckAt time.Time `json:"last_check_at" xorm:"datetime notnull default current_timestamp"`
+	BaseModel   `json:"-" xorm:"-"`
 }
 
 func (pw *ProcessWorker) Create() (err error) {
@@ -31,7 +33,7 @@ func (pw *ProcessWorker) GetLimitByProcess(process Process, limit int) ([]Proces
 }
 
 func (pw *ProcessWorker) Update() error {
-	_, err := Db.Where("id = ?", pw.Id).Cols(`host_id,process_id,pid,state,start_at,is_valid`).Update(pw)
+	_, err := Db.Where("id = ?", pw.Id).Cols(`host_id,process_id,pid,state,start_at,last_check_at,is_valid`).Update(pw)
 	return err
 }
 

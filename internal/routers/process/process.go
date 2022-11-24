@@ -10,6 +10,7 @@ import (
 	"gopkg.in/macaron.v1"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Form struct {
@@ -77,7 +78,8 @@ func Store(_ *macaron.Context, form Form) string {
 	if workerCount < form.NumProc { //新增worker
 		newCount := form.NumProc - workerCount
 		for i := 0; i < newCount; i++ {
-			pw = models.ProcessWorker{ProcessId: processModel.Id, IsValid: 1, State: 0}
+			now := time.Now()
+			pw = models.ProcessWorker{ProcessId: processModel.Id, IsValid: 1, State: 0, StartAt: now, LastCheckAt: now}
 			err = pw.Create()
 			fmt.Println(err)
 		}

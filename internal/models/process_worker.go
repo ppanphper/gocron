@@ -10,7 +10,7 @@ type ProcessWorker struct {
 	IsValid     int8      `json:"is_valid" xorm:"tinyint notnull default 0"`
 	State       Status    `json:"state" xorm:"tinyint notnull default 0"`
 	CreatedAt   time.Time `json:"created_at" xorm:"datetime notnull default current_timestamp created"`
-	StartAt     time.Time `json:"start_at" xorm:"datetime notnull"`
+	StartAt     time.Time `json:"start_at" xorm:"datetime notnull default current_timestamp"`
 	LastCheckAt time.Time `json:"last_check_at" xorm:"datetime notnull default current_timestamp"`
 	BaseModel   `json:"-" xorm:"-"`
 }

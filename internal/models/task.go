@@ -304,8 +304,13 @@ func (task *Task) parseWhere(session *xorm.Session, params CommonMap) {
 	}
 	hostId, ok := params["HostId"]
 	if ok && hostId.(int) > 0 {
-		session.And("th.host_id = ?", hostId)
+		session.And(fmt.Sprintf("(th.host_id = ? OR (project_id != 0 and project_id in (select project_id from %s where host_id = ?)))", TablePrefix+"project_host"), hostId, hostId)
 	}
+	projectId, ok := params["ProjectId"]
+	if ok && projectId.(int) > 0 {
+		session.And("project_id = ?", projectId)
+	}
+
 	name, ok := params["Name"]
 	if ok && name.(string) != "" {
 		session.And("t.name LIKE ?", "%"+name.(string)+"%")

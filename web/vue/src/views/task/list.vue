@@ -16,6 +16,11 @@
         <el-form-item label="任务命令">
           <el-input v-model.trim="searchParams.command"></el-input>
         </el-form-item>
+        <el-form-item label="项目">
+          <el-select v-model="searchParams.project_id" prop="project_id">
+            <el-option v-for="project in projects" :value="project.id" :key="project.id" :label="project.name"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="标签">
           <el-input v-model.trim="searchParams.tag"></el-input>
         </el-form-item>
@@ -185,6 +190,7 @@
 <script>
 import taskService from '../../api/task'
 import format from '@/utils/format'
+import projectService from "@/api/project";
 
 export default {
   name: 'task-list',
@@ -202,6 +208,7 @@ export default {
         name: '',
         tag: '',
         host_id: '',
+        project_id: '',
         status: '',
         command: ''
       },
@@ -226,7 +233,9 @@ export default {
           value: '1',
           label: '停止'
         }
-      ]
+      ],
+      projects:[],
+      projectGroup:{}
     }
   },
   created() {
@@ -242,6 +251,13 @@ export default {
       this.searchParams.host_id = Number(hostId)
     }
     this.search()
+    let _this = this;
+    projectService.all((data) => {
+      _this.projects = data.projects
+      _this.projects.forEach(p => {
+        _this.projectGroup[p.id] = p.name
+      })
+    })
   },
   methods: {
     formatTime: format.formatDatetime,

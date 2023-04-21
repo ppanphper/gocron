@@ -5,7 +5,7 @@
         <strong>{{ title }}</strong>
       </div>
     </template>
-    <el-form ref="form" :model="form" :rules="formRules" label-width="180px">
+    <el-form ref="form" :model="form" :rules="formRules" label-width="180px" v-loading="loading">
       <el-input v-model="form.id" type="hidden"></el-input>
       <el-row>
         <el-col :span="12">
@@ -276,6 +276,7 @@ export default {
   name: 'task-edit',
   data() {
     return {
+      loading: false,
       title: '新增任务',
       projects: [],
       form: {
@@ -428,7 +429,10 @@ export default {
     if (id) {
       this.title = '编辑任务'
     }
+    let _this = this;
+    _this.loading = true;
     taskService.detail(id, (taskData, hosts) => {
+      _this.loading = false;
       if (id && !taskData) {
         this.$message.error('数据不存在')
         this.cancel()

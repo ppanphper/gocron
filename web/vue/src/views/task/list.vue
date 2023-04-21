@@ -79,6 +79,7 @@
     <el-table
         :data="tasks"
         tooltip-effect="dark"
+        v-loading="loading"
         border
         style="width: 100%">
       <el-table-column type="expand">
@@ -89,7 +90,10 @@
             <el-descriptions-item label="单实例运行:">{{ formatMulti(scope.row.multi) }}</el-descriptions-item>
             <el-descriptions-item label="超时时间:">{{ formatTimeout(scope.row.timeout) }}</el-descriptions-item>
             <el-descriptions-item label="重试次数:"> {{ scope.row.retry_times }}</el-descriptions-item>
-            <el-descriptions-item label="重试间隔:">{{ formatRetryTimesInterval(scope.row.retry_interval) }}</el-descriptions-item>
+            <el-descriptions-item label="重试间隔:">{{
+                formatRetryTimesInterval(scope.row.retry_interval)
+              }}
+            </el-descriptions-item>
             <el-descriptions-item label="任务节点:">
               <el-tag style="margin: 0 5px 5px 0" v-for="item in scope.row.hosts" :key="item.host_id">
                 {{ item.alias }} - {{ item.name }}:{{ item.port }} <br>
@@ -186,6 +190,7 @@ export default {
   name: 'task-list',
   data() {
     return {
+      loading: false,
       tasks: [],
       hosts: [],
       taskTotal: 0,
@@ -294,7 +299,10 @@ export default {
     },
     search(callback = null) {
       this.saveSearchParams()
+      let _this = this;
+      _this.loading = true;
       taskService.list(this.searchParams, (tasks, hosts) => {
+        _this.loading = false;
         this.tasks = tasks.data
         this.taskTotal = tasks.total
         this.hosts = hosts
@@ -347,7 +355,7 @@ export default {
 }
 </script>
 <style scoped>
-.bl-none{
+.bl-none {
   border-left: none;
 }
 
@@ -361,7 +369,8 @@ export default {
   margin-bottom: 0;
   width: 50%;
 }
-.el-table__cell{
+
+.el-table__cell {
   padding: 20px 50px;
 }
 </style>

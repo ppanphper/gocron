@@ -27,6 +27,7 @@
         :data="users"
         tooltip-effect="dark"
         border
+        v-loading="loading"
         style="width: 100%">
       <el-table-column
           prop="id"
@@ -36,7 +37,7 @@
           prop="name"
           label="用户名">
       </el-table-column>
-      <el-table-column  prop="source"  label="来源" />
+      <el-table-column prop="source" label="来源"/>
       <el-table-column
           prop="email"
           label="邮箱">
@@ -80,6 +81,7 @@ export default {
   name: 'user-list',
   data() {
     return {
+      loading: false,
       users: [],
       userTotal: 0,
       searchParams: {
@@ -115,7 +117,10 @@ export default {
       this.search()
     },
     search(callback = null) {
+      let _this = this;
+      _this.loading = true;
       userService.list(this.searchParams, (data) => {
+        _this.loading = false;
         this.users = data.data
         this.userTotal = data.total
         if (callback) {

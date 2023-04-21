@@ -157,6 +157,7 @@ export default {
   name: 'process-list',
   data () {
     return {
+      loading: false,
       searchParams: {},
       processTotal: 0,
       processList: [],
@@ -185,7 +186,7 @@ export default {
 
     //每10秒刷新一次页面,获取worker的最新状态
     _this.timer = setInterval(() => {
-      _this.search()
+      _this.search(false)
     }, 10000)
   },
   beforeUnmount() {
@@ -193,9 +194,11 @@ export default {
   },
   methods: {
     formatDatetime: format.formatDatetime,
-    search () {
-      let _this = this
+    search (loading = true) {
+      let _this = this;
+      _this.loading = loading;
       processService.list(this.searchParams, (resp) => {
+        _this.loading = false;
         _this.processTotal = resp.total
         _this.processList = resp.data
       })

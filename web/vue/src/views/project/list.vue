@@ -34,6 +34,7 @@
         tooltip-effect="dark"
         id="project-list"
         border
+        v-loading="loading"
         style="width: 100%">
       <el-table-column prop="id" label="ID" width="100" align="center"/>
       <el-table-column prop="name" label="名称"/>
@@ -50,9 +51,9 @@
   </el-card>
 
 
-
-  <el-dialog v-model="isEdit" :title="editForm.id ?'编辑项目':'新增项目'" :close-on-click-modal="false" :destroy-on-close="true">
-    <el-form ref="projectForm" :model="editForm" :rules="rules" label-width="120px" >
+  <el-dialog v-model="isEdit" :title="editForm.id ?'编辑项目':'新增项目'" :close-on-click-modal="false"
+             :destroy-on-close="true">
+    <el-form ref="projectForm" :model="editForm" :rules="rules" label-width="120px">
       <el-form-item label="项目名称" prop="name" required>
         <el-input v-model="editForm.name"/>
       </el-form-item>
@@ -65,7 +66,7 @@
               v-for="host in hosts"
               :key="host.id"
               :label="host.alias + ' - ' + host.name"
-              :value="host.id" />
+              :value="host.id"/>
         </el-select>
       </el-form-item>
       <el-form-item label="备注">
@@ -93,8 +94,9 @@ export default {
   name: 'project-list',
   data() {
     return {
+      loading: true,
       isEdit: false,
-      hosts:[],
+      hosts: [],
       searchForm: {
         page_size: 20,
         page: 1
@@ -113,9 +115,10 @@ export default {
   },
   methods: {
     search() {
-      let _this = this
+      let _this = this;
+      _this.loading = true
       projectService.list(this.searchForm, function (data) {
-        console.log(data)
+        _this.loading = false;
         _this.projects = data.projects
         _this.projectTotal = data.total
       })
@@ -132,7 +135,10 @@ export default {
       this.search()
     },
     resetSearch() {
-
+      this.searchForm = {
+        page_size: 20,
+        page: 1
+      }
     },
     toEdit(row) {
       if (row !== null) {

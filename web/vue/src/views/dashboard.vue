@@ -1,6 +1,6 @@
 <template>
   <el-row :gutter="12">
-    <el-col :span="6">
+    <el-col :span="6" v-loading="loading">
       <el-card shadow="hover">
         <div class="flex justify-between">
           <div class="icon">
@@ -15,7 +15,7 @@
         </div>
       </el-card>
     </el-col>
-    <el-col :span="6">
+    <el-col :span="6" v-loading="loading">
       <el-card shadow="hover">
         <div class="flex justify-between">
           <div class="icon">
@@ -30,7 +30,7 @@
         </div>
       </el-card>
     </el-col>
-    <el-col :span="6">
+    <el-col :span="6" v-loading="loading">
       <el-card shadow="hover">
         <div class="flex justify-between">
           <div class="icon">
@@ -45,7 +45,7 @@
         </div>
       </el-card>
     </el-col>
-    <el-col :span="6">
+    <el-col :span="6" v-loading="loading">
       <el-card shadow="hover">
         <div class="flex justify-between">
           <div class="icon">
@@ -62,19 +62,19 @@
     </el-col>
   </el-row>
   <el-row style="margin-top: 15px" :gutter="12">
-    <el-col :span="10">
+    <el-col :span="10" v-loading="loading">
       <el-card shadow="hover">
         <div id="project-tasks" style="height: 300px"></div>
       </el-card>
     </el-col>
-    <el-col :span="14">
+    <el-col :span="14" v-loading="loading">
       <el-card shadow="hover">
         <div id="users-chart" style="height: 300px"></div>
       </el-card>
     </el-col>
   </el-row>
   <el-row style="margin-top: 15px" :gutter="12">
-    <el-col :span="24">
+    <el-col :span="24" v-loading="loading">
       <el-card shadow="hover">
         <div id="project-new-data" style="height: 400px"></div>
       </el-card>
@@ -91,6 +91,7 @@ export default {
   name: 'dashboard-view',
   data() {
     return {
+      loading: true,
       totalGroup: {taskCount: 0, processCount: 0, userCount: 0, projectCount: 0},
       projectTaskChart: null,
       projectNewX: [],
@@ -116,6 +117,7 @@ export default {
     let _this = this
     console.log('mounted')
     dashboardService.get({}, function (data) {
+      _this.loading = false;
       _this.totalGroup = data.totalGroup
       let taskChartContainer = document.getElementById('project-tasks');
       let projectTaskChart = echarts.init(taskChartContainer);

@@ -5,7 +5,7 @@
         <strong>登录日志</strong>
       </div>
     </template>
-      <el-pagination
+    <el-pagination
         background
         layout="prev, pager, next, sizes, total"
         :total="logTotal"
@@ -14,32 +14,33 @@
         @current-change="changePage"
         @prev-click="changePage"
         @next-click="changePage">
-      </el-pagination>
-      <el-table
+    </el-pagination>
+    <el-table
         :data="logs"
         border
         ref="table"
+        v-loading="loading"
         style="width: 100%">
-        <el-table-column
+      <el-table-column
           prop="id"
           label="ID">
-        </el-table-column>
-        <el-table-column
+      </el-table-column>
+      <el-table-column
           prop="username"
           label="用户名">
-        </el-table-column>
-        <el-table-column
+      </el-table-column>
+      <el-table-column
           prop="ip"
           label="登录IP">
-        </el-table-column>
-        <el-table-column
+      </el-table-column>
+      <el-table-column
           label="登录时间"
           width="">
-          <template #default="scope">
-            {{ format.formatDatetime(scope.row.created) }}
-          </template>
-        </el-table-column>
-      </el-table>
+        <template #default="scope">
+          {{ format.formatDatetime(scope.row.created) }}
+        </template>
+      </el-table-column>
+    </el-table>
 
   </el-card>
 </template>
@@ -50,8 +51,9 @@ import format from '@/utils/format'
 
 export default {
   name: 'login-log',
-  data () {
+  data() {
     return {
+      loading: false,
       logs: [],
       logTotal: 0,
       searchParams: {
@@ -60,21 +62,24 @@ export default {
       }
     }
   },
-  created () {
+  created() {
     this.format = format
     this.search()
   },
   methods: {
-    changePage (page) {
+    changePage(page) {
       this.searchParams.page = page
       this.search()
     },
-    changePageSize (pageSize) {
+    changePageSize(pageSize) {
       this.searchParams.page_size = pageSize
       this.search()
     },
-    search () {
+    search() {
+      let _this = this;
+      _this.loading = true;
       systemService.loginLogList(this.searchParams, (data) => {
+        _this.loading = false;
         this.logs = data.data
         this.logTotal = data.total
       })

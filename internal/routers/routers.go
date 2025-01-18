@@ -1,9 +1,15 @@
 package routers
 
 import (
+	"encoding/json"
+	"github.com/ouqiang/gocron/internal/models"
+	"github.com/ouqiang/gocron/internal/routers/dashboard"
+	"github.com/ouqiang/gocron/internal/routers/process"
+	"github.com/ouqiang/gocron/internal/routers/project"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -56,8 +62,8 @@ func Register(m *macaron.Macaron) {
 		}
 
 		io.Copy(ctx.Resp, file)
-
 	})
+	m.Get("/dashboard", dashboard.Index)
 	// 系统安装
 	m.Group("/install", func() {
 		m.Post("/store", binding.Bind(install.InstallForm{}), install.Store)
@@ -94,6 +100,24 @@ func Register(m *macaron.Macaron) {
 		m.Get("/run/:id", task.Run)
 	})
 
+	// 进程管理
+	m.Group("/process", func() {
+		m.Get("", process.Index)
+		m.Post("/store", binding.Bind(process.Form{}), process.Store)
+		m.Get("/:id", process.Get)
+		m.Post("/start/:id", process.Start)
+		m.Post("/stop/:id", process.Stop)
+		m.Post("/enable/:id", process.Enable)
+		m.Post("/disable/:id", process.Disable)
+		m.Post("/restart/:id", process.Restart)
+	})
+
+	m.Group("/project", func() {
+		m.Get("", project.Index)
+		m.Get("/all", project.All)
+		m.Post("", binding.Bind(project.ProjectForm{}), project.Store)
+	})
+
 	// 主机
 	m.Group("/host", func() {
 		m.Get("/:id", host.Detail)
@@ -106,6 +130,10 @@ func Register(m *macaron.Macaron) {
 
 	// 管理
 	m.Group("/system", func() {
+		m.Group("/setting", func() {
+			m.Get("", manage.GetSystemSetting)
+			m.Post("", manage.UpdateSystemSetting)
+		})
 		m.Group("/slack", func() {
 			m.Get("", manage.Slack)
 			m.Post("/update", manage.UpdateSlack)
@@ -122,6 +150,13 @@ func Register(m *macaron.Macaron) {
 			m.Get("", manage.WebHook)
 			m.Post("/update", manage.UpdateWebHook)
 		})
+
+		m.Group("/ldap", func() {
+			m.Get("", manage.LdapSetting)
+			m.Post("/test", binding.Bind(models.LDAPSetting{}), manage.LdapTest)
+			m.Post("/update", manage.UpdateLdapSetting)
+		})
+
 		m.Get("/login-log", loginlog.Index)
 	})
 
@@ -146,7 +181,7 @@ func Register(m *macaron.Macaron) {
 	})
 }
 
-// 中间件注册
+// RegisterMiddleware 中间件注册
 func RegisterMiddleware(m *macaron.Macaron) {
 	m.Use(macaron.Logger())
 	m.Use(macaron.Recovery())
@@ -170,6 +205,7 @@ func RegisterMiddleware(m *macaron.Macaron) {
 	m.Use(ipAuth)
 	m.Use(userAuth)
 	m.Use(urlAuth)
+	m.Use(operateLogMiddleware)
 }
 
 // region 自定义中间件
@@ -250,13 +286,18 @@ func urlAuth(ctx *macaron.Context) {
 	// 普通用户允许访问的URL地址
 	allowPaths := []string{
 		"",
+		"/dashboard",
 		"/install/status",
+		"/project",
+		"/project/all",
+		"/process",
 		"/task",
 		"/task/log",
 		"/host",
 		"/host/all",
 		"/user/login",
 		"/user/editMyPassword",
+		"/system/setting",
 	}
 	for _, path := range allowPaths {
 		if path == uri {
@@ -268,6 +309,60 @@ func urlAuth(ctx *macaron.Context) {
 
 	data := jsonResp.Failure(utils.UnauthorizedError, "您无权限访问")
 	ctx.Write([]byte(data))
+}
+
+//操作日志中间键
+func operateLogMiddleware(req *http.Request, ctx *macaron.Context) {
+	ctx.Next()
+	// 不记录GET请求的日志
+	if req.Method == "GET" {
+		return
+	}
+	uri := strings.TrimRight(ctx.Req.URL.Path, "/")
+	type LogData struct {
+		Body   string
+		Post   url.Values
+		Resp   string
+		Query  map[string]interface{}
+		Header map[string]string
+	}
+
+	//_ = ctx.Req.ParseForm() // 填充Form,PostForm
+
+	data := LogData{Header: map[string]string{}, Query: map[string]interface{}{}}
+	body, err := ctx.Req.Body().String()
+	if err != nil {
+		return
+	}
+	data.Body = body
+	data.Post = req.PostForm
+
+	for field := range data.Post {
+		if strings.Contains(strings.ToLower(field), "password") {
+			data.Post[field] = []string{"********"}
+		}
+	}
+
+	dataBytes, err := json.Marshal(data)
+	if err != nil {
+		return
+	}
+
+	username := ""
+	_ = user.RestoreToken(ctx)
+	if ctx.Data["username"] != nil {
+		username = ctx.Data["username"].(string)
+	}
+
+	l := models.OperateLog{
+		Username:   username,
+		Ip:         ctx.RemoteAddr(),
+		Uri:        uri,
+		HttpMethod: ctx.Req.Method,
+		Data:       string(dataBytes),
+	}
+	_, _ = l.Create()
+	return
 }
 
 /** API接口签名验证 **/

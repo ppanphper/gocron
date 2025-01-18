@@ -47,16 +47,16 @@ package-all: build-vue statik
 
 .PHONY: build-vue
 build-vue:
-	cd web/vue && yarn run build
+	cd web/vue && npm run build
 	cp -r web/vue/dist/* web/public/
 
 .PHONY: install-vue
 install-vue:
-	cd web/vue && yarn install
+	cd web/vue && npm install
 
 .PHONY: run-vue
 run-vue:
-	cd web/vue && yarn run dev
+	cd web/vue && npm run dev
 
 .PHONY: statik
 statik:
@@ -70,3 +70,8 @@ statik:
 clean:
 	rm bin/gocron
 	rm bin/gocron-node
+
+.PHONY: grpc
+grpc:
+	protoc --go_out=./internal/modules/rpc/proto/ --go-grpc_out=./internal/modules/rpc/proto/ --go-grpc_opt=require_unimplemented_servers=false ./internal/modules/rpc/proto/process.proto
+	protoc --go_out=./internal/modules/rpc/proto/ --go-grpc_out=./internal/modules/rpc/proto/ --go-grpc_opt=require_unimplemented_servers=false ./internal/modules/rpc/proto/task.proto

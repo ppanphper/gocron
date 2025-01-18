@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "./;rpc";
+
+service Process {
+  rpc StartWorker(StartRequest) returns (StartResponse);
+  rpc StopWorker(StopRequest) returns (StopResponse);
+  rpc WorkerStateCheck(StateRequest) returns (StateResponse);
+}
+
+message StartRequest {
+  string command = 1; // 命令
+  string logFile = 2; //日志文件
+}
+
+message StartResponse {
+  string code = 1;
+  string message = 2;
+  int64 pid = 3;
+}
+
+message StopRequest {
+  int64 pid = 1; //
+}
+
+message StopResponse {
+  string code = 1;
+  string message = 2;
+}
+
+message StateRequest {
+  int64 pid = 1; //
+}
+
+message StateResponse {
+  string code = 1;
+  string state = 2;
+  string message = 3;
+}

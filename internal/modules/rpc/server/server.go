@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/ouqiang/gocron/internal/modules/logger"
 	"net"
 	"os"
 	"os/signal"
@@ -18,6 +19,7 @@ import (
 )
 
 type Server struct{}
+type ProcessServer struct{}
 
 var keepAlivePolicy = keepalive.EnforcementPolicy{
 	MinTime:             10 * time.Second,
@@ -30,6 +32,7 @@ var keepAliveParams = keepalive.ServerParameters{
 	Timeout:           3 * time.Second,
 }
 
+// Run 实现rpc Task Run方法
 func (s Server) Run(ctx context.Context, req *pb.TaskRequest) (*pb.TaskResponse, error) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -50,7 +53,31 @@ func (s Server) Run(ctx context.Context, req *pb.TaskRequest) (*pb.TaskResponse,
 	return resp, nil
 }
 
+// StartWorker 开启进程
+func (s ProcessServer) StartWorker(ctx context.Context, req *pb.StartRequest) (*pb.StartResponse, error) {
+	pid, err := utils.StartWorker(ctx, req)
+	return &pb.StartResponse{Pid: int64(pid)}, err
+}
+
+func (s ProcessServer) StopWorker(_ context.Context, req *pb.StopRequest) (*pb.StopResponse, error) {
+	err := utils.StopWorker(int(req.Pid))
+	if err != nil {
+		return &pb.StopResponse{Code: "fail", Message: err.Error()}, err
+	}
+	return &pb.StopResponse{Code: "success", Message: "Success"}, nil
+}
+
+func (s ProcessServer) WorkerStateCheck(_ context.Context, req *pb.StateRequest) (*pb.StateResponse, error) {
+	state, _ := utils.WorkerStateCheck(int(req.Pid))
+	return &pb.StateResponse{Code: "success", Message: "Success", State: state}, nil
+}
+
 func Start(addr string, enableTLS bool, certificate auth.Certificate) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("服务崩溃启动异常:", err)
+		}
+	}()
 	l, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatal(err)
@@ -69,6 +96,7 @@ func Start(addr string, enableTLS bool, certificate auth.Certificate) {
 	}
 	server := grpc.NewServer(opts...)
 	pb.RegisterTaskServer(server, Server{})
+	pb.RegisterProcessServer(server, ProcessServer{})
 	log.Infof("server listen on %s", addr)
 
 	go func() {

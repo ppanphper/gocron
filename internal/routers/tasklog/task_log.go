@@ -33,7 +33,12 @@ func Index(ctx *macaron.Context) string {
 // 清空日志
 func Clear(ctx *macaron.Context) string {
 	taskLogModel := new(models.TaskLog)
-	_, err := taskLogModel.Clear()
+	taskId := ctx.Req.PostFormValue("task_id")
+	status := ctx.Req.PostFormValue("status")
+	protocol := ctx.Req.PostFormValue("protocol")
+	filter := models.CommonMap{"taskId": taskId, "status": status, "protocol": protocol}
+
+	_, err := taskLogModel.Clear(filter)
 	json := utils.JsonResponse{}
 	if err != nil {
 		return json.CommonFailure(utils.FailureContent)
@@ -59,7 +64,7 @@ func Stop(ctx *macaron.Context) string {
 		return json.CommonFailure("任务节点列表为空")
 	}
 	for _, host := range task.Hosts {
-		service.ServiceTask.Stop(host.Name, host.Port, id)
+		service.TaskService.Stop(host.Name, host.Port, id)
 
 	}
 

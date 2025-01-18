@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"github.com/ouqiang/gocron/internal/service"
 	"strings"
 	"time"
 
@@ -72,7 +73,7 @@ func Detail(ctx *macaron.Context) string {
 	return jsonResp.Success(utils.SuccessContent, userModel)
 }
 
-// 保存任务
+// Store 保存用户
 func Store(ctx *macaron.Context, form UserForm) string {
 	form.Name = strings.TrimSpace(form.Name)
 	form.Email = strings.TrimSpace(form.Email)
@@ -114,6 +115,7 @@ func Store(ctx *macaron.Context, form UserForm) string {
 	userModel.Status = form.Status
 
 	if form.Id == 0 {
+		userModel.Source = models.SourceSystem
 		_, err = userModel.Create()
 		if err != nil {
 			return json.CommonFailure("添加失败", err)
@@ -133,7 +135,7 @@ func Store(ctx *macaron.Context, form UserForm) string {
 	return json.Success("保存成功", nil)
 }
 
-// 删除用户
+// Remove 删除用户
 func Remove(ctx *macaron.Context) string {
 	id := ctx.ParamsInt(":id")
 	json := utils.JsonResponse{}
@@ -147,12 +149,12 @@ func Remove(ctx *macaron.Context) string {
 	return json.Success(utils.SuccessContent, nil)
 }
 
-// 激活用户
+// Enable 激活用户
 func Enable(ctx *macaron.Context) string {
 	return changeStatus(ctx, models.Enabled)
 }
 
-// 禁用用户
+// Disable 禁用用户
 func Disable(ctx *macaron.Context) string {
 	return changeStatus(ctx, models.Disabled)
 }
@@ -209,7 +211,8 @@ func UpdateMyPassword(ctx *macaron.Context) string {
 		return json.CommonFailure("原密码与新密码不能相同")
 	}
 	userModel := new(models.User)
-	if !userModel.Match(Username(ctx), oldPassword) {
+	userModel.Get(Username(ctx))
+	if !userModel.MatchPassword(oldPassword) {
 		return json.CommonFailure("原密码输入错误")
 	}
 	_, err := userModel.UpdatePassword(Uid(ctx), newPassword)
@@ -228,19 +231,56 @@ func ValidateLogin(ctx *macaron.Context) string {
 	if username == "" || password == "" {
 		return json.CommonFailure("用户名、密码不能为空")
 	}
-	userModel := new(models.User)
-	if !userModel.Match(username, password) {
-		return json.CommonFailure("用户名或密码错误")
+	user := new(models.User)
+	err := user.Get(username)
+
+	ldapSetting, _ := new(models.Setting).LdapSettings()
+	//ldap校验
+	ldapService := service.LdapService
+	if (user.Id == 0 || user.Source == models.SourceLdap) && ldapService.Enable(ldapSetting) {
+		//LDAP验证 如果用户通过LDAP关联,则只通过LDAP进行认证，LDAP用户不可用则系统用户自动不可用
+		entry, err := ldapService.Match(username, password, ldapSetting)
+		if err != nil {
+			return json.CommonFailure("Ldap验证失败", err)
+		}
+
+		if user.Id == 0 {
+			var email string
+			values := ldapService.GetEntryAttribute(entry, ldapSetting.LdapEmailAttribute)
+			if len(values) > 0 {
+				email = values[0]
+			}
+
+			if email == "" { //如果没有邮箱的话自动生成一个邮箱适配系统
+				email = username + "@example.ldap"
+			}
+
+			user.Name = username
+			user.Password = password
+			user.Email = email
+			user.Source = models.SourceLdap
+			user.IsAdmin = 0
+			_, err = user.Create()
+			if err != nil {
+				return json.CommonFailure("Ldap关联系统用户失败", err)
+			}
+		}
+	} else {
+		//数据库验证
+		if !user.MatchPassword(password) {
+			return json.CommonFailure("用户名或密码错误")
+		}
 	}
+
 	loginLogModel := new(models.LoginLog)
-	loginLogModel.Username = userModel.Name
+	loginLogModel.Username = user.Name
 	loginLogModel.Ip = ctx.RemoteAddr()
-	_, err := loginLogModel.Create()
+	_, err = loginLogModel.Create()
 	if err != nil {
 		logger.Error("记录用户登录日志失败", err)
 	}
 
-	token, err := generateToken(userModel)
+	token, err := generateToken(user)
 	if err != nil {
 		logger.Errorf("生成jwt失败: %s", err)
 		return json.Failure(utils.AuthError, "认证失败")
@@ -248,9 +288,9 @@ func ValidateLogin(ctx *macaron.Context) string {
 
 	return json.Success(utils.SuccessContent, map[string]interface{}{
 		"token":    token,
-		"uid":      userModel.Id,
-		"username": userModel.Name,
-		"is_admin": userModel.IsAdmin,
+		"uid":      user.Id,
+		"username": user.Name,
+		"is_admin": user.IsAdmin,
 	})
 }
 
@@ -313,7 +353,7 @@ func generateToken(user *models.User) (string, error) {
 	return token.SignedString([]byte(app.Setting.AuthSecret))
 }
 
-// 还原jwt
+// RestoreToken 还原jwt
 func RestoreToken(ctx *macaron.Context) error {
 	authToken := ctx.Req.Header.Get("Auth-Token")
 	if authToken == "" {

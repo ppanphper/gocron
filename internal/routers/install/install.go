@@ -92,7 +92,7 @@ func Store(ctx *macaron.Context, form InstallForm) string {
 
 	app.Installed = true
 	// 初始化定时任务
-	service.ServiceTask.Initialize()
+	service.TaskService.Initialize()
 
 	return json.Success("安装成功", nil)
 }
@@ -131,6 +131,7 @@ func createAdminUser(form InstallForm) error {
 	user.Name = form.AdminUsername
 	user.Password = form.AdminPassword
 	user.Email = form.AdminEmail
+	user.Source = models.SourceSystem
 	user.IsAdmin = 1
 	_, err := user.Create()
 

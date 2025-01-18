@@ -2,11 +2,16 @@ package manage
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/ouqiang/gocron/internal/modules/app"
+	"github.com/ouqiang/gocron/internal/service"
+	"gopkg.in/macaron.v1"
+	"strconv"
+	"strings"
 
 	"github.com/ouqiang/gocron/internal/models"
 	"github.com/ouqiang/gocron/internal/modules/logger"
 	"github.com/ouqiang/gocron/internal/modules/utils"
-	"gopkg.in/macaron.v1"
 )
 
 func Slack(ctx *macaron.Context) string {
@@ -16,7 +21,6 @@ func Slack(ctx *macaron.Context) string {
 	if err != nil {
 		logger.Error(err)
 		return jsonResp.Success(utils.SuccessContent, nil)
-
 	}
 
 	return jsonResp.Success(utils.SuccessContent, slack)
@@ -54,7 +58,7 @@ func RemoveSlackChannel(ctx *macaron.Context) string {
 
 // endregion
 
-// region 邮件
+// Mail region 邮件
 func Mail(ctx *macaron.Context) string {
 	settingModel := new(models.Setting)
 	mail, err := settingModel.Mail()
@@ -125,6 +129,51 @@ func UpdateWebHook(ctx *macaron.Context) string {
 	err := settingModel.UpdateWebHook(url, template)
 
 	return utils.JsonResponseByErr(err)
+}
+
+func LdapSetting(_ *macaron.Context) string {
+	settingModel := new(models.Setting)
+	settings, _ := settingModel.LdapSettings()
+
+	jsonResp := utils.JsonResponse{}
+	return jsonResp.Success(utils.SuccessContent, settings)
+}
+
+func LdapTest(ctx *macaron.Context, setting models.LDAPSetting) string {
+	entry, err := service.LdapService.Match(ctx.Req.FormValue("username"), ctx.Req.FormValue("password"), setting)
+
+	if err != nil {
+		return utils.JsonResp.CommonFailure(fmt.Sprintf("连接登录验证失败:%s", err), err)
+	}
+	return utils.JsonResp.Success("Success", entry.DN)
+}
+
+func UpdateLdapSetting(ctx *macaron.Context) string {
+	setting := new(models.Setting)
+
+	_ = ctx.Req.ParseForm()
+	for name, values := range ctx.Req.PostForm {
+		_ = setting.Set(models.LdapCode, name, strings.Join(values, ","))
+	}
+
+	jsonResp := utils.JsonResponse{}
+	return jsonResp.Success(utils.SuccessContent, nil)
+}
+
+func UpdateSystemSetting(ctx *macaron.Context) string {
+	s := new(models.Setting)
+
+	_ = s.Set("system", "logo", ctx.Req.FormValue("logo"))
+	_ = s.Set("system", "title", ctx.Req.FormValue("title"))
+
+	return utils.JsonResp.Success(utils.SuccessContent, nil)
+}
+
+func GetSystemSetting() string {
+	s := new(models.Setting)
+	settings := s.SystemSettings()
+	settings["versionId"] = strconv.Itoa(app.GetCurrentVersionId())
+	return utils.JsonResp.Success(utils.SuccessContent, settings)
 }
 
 // endregion

@@ -16,7 +16,7 @@ spec:
   selector:
     app: gocron
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: gocron
@@ -33,7 +33,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: gocron
-        image: ouqg/gocron:latest
+        image: peng49/gocron:latest
         ports:
         - containerPort: 5920
           name: gocron

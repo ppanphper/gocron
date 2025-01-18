@@ -17,11 +17,12 @@ func (migration *Migration) Install(dbName string) error {
 	task := new(Task)
 	tables := []interface{}{
 		&User{}, task, &TaskLog{}, &Host{}, setting, &LoginLog{}, &TaskHost{},
+		&OperateLog{}, &Process{}, &ProcessHost{}, &ProcessWorker{}, &Project{}, &ProjectHost{},
 	}
 	for _, table := range tables {
 		exist, err := Db.IsTableExist(table)
 		if exist {
-			return errors.New("数据表已存在")
+			return errors.New(fmt.Sprintf("数据表已存在%s", err))
 		}
 		if err != nil {
 			return err
@@ -36,20 +37,22 @@ func (migration *Migration) Install(dbName string) error {
 	return nil
 }
 
-// 迭代升级数据库, 新建表、新增字段等
+// Upgrade 迭代升级数据库, 新建表、新增字段等
 func (migration *Migration) Upgrade(oldVersionId int) {
 	// v1.2版本不支持升级
 	if oldVersionId == 120 {
 		return
 	}
 
-	versionIds := []int{110, 122, 130, 140, 150}
+	versionIds := []int{110, 122, 130, 140, 150, 200, 203}
 	upgradeFuncs := []func(*xorm.Session) error{
 		migration.upgradeFor110,
 		migration.upgradeFor122,
 		migration.upgradeFor130,
 		migration.upgradeFor140,
 		migration.upgradeFor150,
+		migration.upgradeFor200,
+		migration.upgradeFor203,
 	}
 
 	startIndex := -1
@@ -234,4 +237,67 @@ func (m *Migration) upgradeFor150(session *xorm.Session) error {
 	logger.Info("已升级到v1.5\n")
 
 	return nil
+}
+
+//升级到v2.0.0
+func (m *Migration) upgradeFor200(session *xorm.Session) error {
+	logger.Info("开始升级到v2.0.0")
+	err := session.CreateTable(Project{})
+	if err != nil {
+		logger.Info("升级到v2.0.0失败\n", err)
+		return err
+	}
+	err = session.CreateTable(ProjectHost{})
+	if err != nil {
+		logger.Info("升级到v2.0.0失败\n", err)
+		return err
+	}
+	err = session.CreateTable(OperateLog{})
+	if err != nil {
+		logger.Info("升级到v2.0.0失败\n", err)
+		return err
+	}
+	err = session.CreateTable(Process{})
+	if err != nil {
+		logger.Info("升级到v2.0.0失败\n", err)
+		return err
+	}
+	err = session.CreateTable(ProcessWorker{})
+	if err != nil {
+		logger.Info("升级到v2.0.0失败\n", err)
+		return err
+	}
+	err = session.CreateTable(ProcessHost{})
+	if err != nil {
+		logger.Info("升级到v2.0.0失败\n", err)
+		return err
+	}
+
+	err = session.Sync2(new(Task))
+	if err != nil {
+		logger.Info("升级到v2.0.0失败\n", err)
+		return err
+	}
+
+	err = session.Sync2(new(User))
+	if err != nil {
+		logger.Info("升级到v2.0.0失败\n", err)
+		return err
+	}
+
+	s := new(Setting)
+	_ = s.Set("system", "logo", "https://avatars.githubusercontent.com/u/53442552?v=4")
+	_ = s.Set("system", "title", "gocron")
+
+	logger.Info("已升级到v2.0.0\n")
+	return err
+}
+
+func (m *Migration) upgradeFor203(session *xorm.Session) error {
+	logger.Info("开始升级到v2.0.3")
+	
+	err := session.Sync2(new(ProcessWorker))
+
+	logger.Info("已升级到v2.0.3\n")
+	return err
 }

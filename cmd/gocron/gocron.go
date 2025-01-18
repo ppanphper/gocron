@@ -1,5 +1,6 @@
 // Command gocron
-//go:generate statik -src=../../web/public -dest=../../internal -f
+
+//go:generate statik -src=../../web/vue/dist -dest=../../internal -f
 
 package main
 
@@ -8,7 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	macaron "gopkg.in/macaron.v1"
+	"gopkg.in/macaron.v1"
 
 	"github.com/ouqiang/gocron/internal/models"
 	"github.com/ouqiang/gocron/internal/modules/app"
@@ -21,11 +22,12 @@ import (
 )
 
 var (
-	AppVersion           = "1.5"
-	BuildDate, GitCommit string
+	AppVersion = "2.0.5"
+	GitCommit  string
+	BuildDate  string
 )
 
-// web服务器默认端口
+// DefaultPort web服务器默认端口
 const DefaultPort = 5920
 
 func main() {
@@ -106,7 +108,9 @@ func initModule() {
 	upgradeIfNeed()
 
 	// 初始化定时任务
-	service.ServiceTask.Initialize()
+	service.TaskService.Initialize()
+
+	service.ProcessService.Initialize()
 }
 
 // 解析端口
@@ -175,7 +179,7 @@ func shutdown() {
 	logger.Info("应用准备退出")
 	// 停止所有任务调度
 	logger.Info("停止定时任务调度")
-	service.ServiceTask.WaitAndExit()
+	service.TaskService.WaitAndExit()
 }
 
 // 判断应用是否需要升级, 当存在版本号文件且版本小于app.VersionId时升级

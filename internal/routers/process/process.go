@@ -2,15 +2,16 @@ package process
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/ouqiang/gocron/internal/models"
 	"github.com/ouqiang/gocron/internal/modules/logger"
 	"github.com/ouqiang/gocron/internal/modules/utils"
 	"github.com/ouqiang/gocron/internal/routers/base"
 	"github.com/ouqiang/gocron/internal/service"
 	"gopkg.in/macaron.v1"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type Form struct {
@@ -81,10 +82,12 @@ func Store(_ *macaron.Context, form Form) string {
 			now := time.Now()
 			pw = models.ProcessWorker{ProcessId: processModel.Id, IsValid: 1, State: 0, StartAt: now, LastCheckAt: now}
 			err = pw.Create()
-			fmt.Println(err)
+			if err != nil {
+				fmt.Println("创建进程失败：" + err.Error())
+			}
 		}
 	}
-	fmt.Println(workerCount, workers)
+	fmt.Println("进程数：", workerCount, "进程对象：", workers)
 	if workerCount > form.NumProc { //删除worker
 		removeCount := workerCount - form.NumProc
 		workers, _ := pw.GetLimitByProcess(processModel, removeCount)
@@ -197,6 +200,20 @@ func Restart(ctx *macaron.Context) string {
 	_ = service.ProcessService.StopProcess(process)
 
 	return json.Success("Success", nil)
+}
+
+func Delete(ctx *macaron.Context) string {
+	id := ctx.ParamsInt(":id")
+	process := models.Process{}
+	err := process.Delete(id)
+	if err != nil {
+		return utils.JsonResp.CommonFailure("删除失败", err)
+	}
+	err = service.ProcessService.StopProcess(process)
+	if err != nil {
+		return utils.JsonResp.CommonFailure("删除失败", err)
+	}
+	return utils.JsonResp.Success("删除成功", nil)
 }
 
 func parseQueryParams(ctx *macaron.Context) models.CommonMap {

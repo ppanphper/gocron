@@ -116,7 +116,8 @@
         <el-table-column  prop="tag" label="标签" />
         <el-table-column  label="状态" width="100" align="center">
           <template #default="scope">
-            <el-tag v-if="scope.row.status === 1" type="success">已启动</el-tag>
+            <el-tag v-if="scope.row.status === 0" type="success">初始化</el-tag>
+            <el-tag v-else-if="scope.row.status === 1" type="success">已启动</el-tag>
             <el-tag v-else-if="scope.row.status === 2" type="info">已停止</el-tag>
             <el-tag v-else>未知状态 {{scope.row.status}}</el-tag>
           </template>
@@ -140,6 +141,7 @@
             <el-button type="success" v-if="scope.row.status !== 1" @click="start(scope.row.id)">启动</el-button>
             <el-button type="danger" v-if="scope.row.status === 1" @click="stop(scope.row.id)">停止</el-button>
             <el-button type="warning" v-if="scope.row.status === 1" @click="restart(scope.row.id)">重启</el-button>
+            <el-button type="danger" @click="remove(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -271,6 +273,18 @@ export default {
         path = `/process/edit/${id}`
       }
       this.$router.push(path)
+    },
+    remove (id) {
+      this.$confirm('确定要删除这个进程吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        processService.delete(id, () => {
+          this.$message.success('删除成功')
+          this.search()
+        })
+      })
     }
   }
 }

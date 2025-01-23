@@ -30,5 +30,9 @@ export default {
     httpClient.instance
         .post(`/process/disable/${id}`)
         .then(callback)
+  },
+
+  delete (id, callback) {
+    httpClient.delete(`/process/${id}`, {}, callback)
   }
 }

@@ -25,7 +25,7 @@ func init() {
 func TestCreateTable(t *testing.T) {
 	err := Db.CreateTables(Project{})
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatalf("%s", err.Error())
 	}
 }
 

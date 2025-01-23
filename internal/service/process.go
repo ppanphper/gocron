@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/ouqiang/gocron/internal/models"
 	"github.com/ouqiang/gocron/internal/modules/logger"
 	"github.com/ouqiang/gocron/internal/modules/rpc/grpcpool"
@@ -10,7 +12,6 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"time"
 )
 
 type Process struct{}
@@ -83,7 +84,7 @@ func (p Process) CheckWorkerIsRunning(worker models.ProcessWorker) {
 	if err != nil {
 		if status.Code(err) == codes.Unavailable {
 			//服务不可用
-			logger.Info("服务不可用")
+			logger.Error("服务不可用", err)
 			worker.State = models.Unknown
 		}
 		_ = worker.Update()
@@ -117,15 +118,19 @@ func getWorkerState(worker models.ProcessWorker) (string, error) {
 }
 
 func workerStart(worker *models.ProcessWorker) {
-	logger.Debug("workerStart running")
+	// logger.Debug("workerStart running")
 	host := models.Host{}
 	err := host.Find(worker.HostId)
 	if err != nil {
-		logger.Debug("get worker fail", err)
+		logger.Error("get worker fail", err)
 		return
 	}
 	addr := fmt.Sprintf("%s:%d", host.Name, host.Port)
 	client, err := grpcpool.Pool.GetClient(addr)
+	if err != nil {
+		logger.Error("get worker client fail", err)
+		return
+	}
 
 	process := models.Process{}
 	_ = process.Get(worker.ProcessId)
@@ -135,6 +140,10 @@ func workerStart(worker *models.ProcessWorker) {
 		LogFile: process.LogFile,
 	}
 	resp, err := client.StartWorker(context.Background(), &req)
+	if err != nil {
+		logger.Error("start worker fail", err)
+		return
+	}
 	worker.State = models.Running
 	worker.Pid = int(resp.Pid)
 }
@@ -152,6 +161,10 @@ func (p Process) StopWorker(worker models.ProcessWorker) {
 	}
 	addr := fmt.Sprintf("%s:%d", host.Name, host.Port)
 	client, err := grpcpool.Pool.GetClient(addr)
+	if err != nil {
+		logger.Error("get worker client fail", err)
+		return
+	}
 	req := rpc.StopRequest{
 		Pid: int64(worker.Pid),
 	}

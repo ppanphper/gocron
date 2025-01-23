@@ -159,7 +159,9 @@ export default {
         if (!valid) {
           return false
         }
-        this.editForm.host_ids = this.editForm.host_ids.join(',')
+        if (this.editForm.host_ids.length > 0) {
+          this.editForm.host_ids = this.editForm.host_ids.join(',')
+        }
         projectService.store(this.editForm, function () {
           _this.$message.success('操作成功')
           _this.isEdit = false

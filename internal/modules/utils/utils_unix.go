@@ -6,10 +6,6 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"github.com/ouqiang/gocron/internal/modules/logger"
-	rpc "github.com/ouqiang/gocron/internal/modules/rpc/proto"
-	"golang.org/x/net/context"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -17,6 +13,10 @@ import (
 	"regexp"
 	"strings"
 	"syscall"
+
+	"github.com/ouqiang/gocron/internal/modules/logger"
+	rpc "github.com/ouqiang/gocron/internal/modules/rpc/proto"
+	"golang.org/x/net/context"
 )
 
 type Result struct {
@@ -107,7 +107,7 @@ func isRunning(pid int) bool {
 		return !os.IsNotExist(err)
 	}
 
-	content, err := ioutil.ReadFile(pathString)
+	content, err := os.ReadFile(pathString)
 	if err != nil {
 		return false
 	}

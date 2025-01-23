@@ -7,32 +7,9 @@
     </template>
     <el-form :inline="true" label-position="right">
       <el-row>
-        <el-form-item label="任务ID">
-          <el-input v-model.trim="searchParams.id"></el-input>
-        </el-form-item>
-        <el-form-item label="任务名称">
-          <el-input v-model.trim="searchParams.name"></el-input>
-        </el-form-item>
-        <el-form-item label="任务命令">
-          <el-input v-model.trim="searchParams.command"></el-input>
-        </el-form-item>
         <el-form-item label="项目">
           <el-select v-model="searchParams.project_id" prop="project_id">
             <el-option v-for="project in projects" :value="project.id" :key="project.id" :label="project.name"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="标签">
-          <el-input v-model.trim="searchParams.tag"></el-input>
-        </el-form-item>
-        <el-form-item label="执行方式">
-          <el-select v-model.trim="searchParams.protocol">
-            <el-option label="全部" value=""></el-option>
-            <el-option
-                v-for="item in protocolList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="任务节点">
@@ -56,6 +33,31 @@
                 :value="item.value">
             </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="执行方式">
+          <el-select v-model.trim="searchParams.protocol">
+            <el-option label="全部" value=""></el-option>
+            <el-option
+                v-for="item in protocolList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-row>
+      <el-row>
+        <el-form-item label="任务ID">
+          <el-input v-model.trim="searchParams.id"></el-input>
+        </el-form-item>
+        <el-form-item label="任务名称">
+          <el-input v-model.trim="searchParams.name"></el-input>
+        </el-form-item>
+        <el-form-item label="任务命令">
+          <el-input v-model.trim="searchParams.command"></el-input>
+        </el-form-item>
+        <el-form-item label="标签">
+          <el-input v-model.trim="searchParams.tag"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="search()">搜索</el-button>
@@ -388,5 +390,16 @@ export default {
 
 .el-table__cell {
   padding: 20px 50px;
+}
+
+:deep(.el-select) {
+  width: 200px;
+}
+
+:deep(.el-select-dropdown__item) {
+  white-space: normal;
+  height: auto;
+  line-height: 1.5;
+  padding: 8px 20px;
 }
 </style>

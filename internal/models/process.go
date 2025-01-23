@@ -2,9 +2,10 @@ package models
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/go-xorm/xorm"
 	"github.com/ouqiang/gocron/internal/modules/app"
-	"time"
 )
 
 type ProcessStatus int8
@@ -126,4 +127,9 @@ func (p *Process) parseWhere(session *xorm.Session, params CommonMap) {
 	if ok && command.(string) != "" {
 		session.And("p.command LIKE ?", "%"+command.(string)+"%")
 	}
+}
+
+func (p *Process) Delete(id int) error {
+	_, err := Db.Id(id).Delete(p)
+	return err
 }

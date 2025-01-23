@@ -115,7 +115,7 @@ export default {
   },
   mounted() {
     let _this = this
-    console.log('mounted')
+    // console.log('mounted')
     dashboardService.get({}, function (data) {
       _this.loading = false;
       _this.totalGroup = data.totalGroup

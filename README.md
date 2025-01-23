@@ -1,7 +1,7 @@
 # gocron - 定时任务管理系统
-[![Downloads](https://img.shields.io/github/downloads/peng49/gocron/total.svg)](https://github.com/peng49/gocron/releases)
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/peng49/gocron/blob/master/LICENSE)
-[![Release](https://img.shields.io/github/release/peng49/gocron.svg?label=Release)](https://github.com/peng49/gocron/releases)
+[![Downloads](https://img.shields.io/github/downloads/ppanphper/gocron/total.svg)](https://github.com/ppanphper/gocron/releases)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/ppanphper/gocron/blob/master/LICENSE)
+[![Release](https://img.shields.io/github/release/ppanphper/gocron.svg?label=Release)](https://github.com/ppanphper/gocron/releases)
 
 # 项目简介
 
@@ -35,9 +35,9 @@
 
 
 ## 下载
-[releases](https://github.com/peng49/gocron/releases)  
+[releases](https://github.com/ppanphper/gocron/releases)  
 
-[版本升级](https://github.com/peng49/gocron/wiki/版本升级)
+[版本升级](https://github.com/ppanphper/gocron/wiki/版本升级)
 
 ## 安装
 
@@ -56,7 +56,7 @@
 ### 源码安装
 
 - 安装Go 1.18+
-- `go get -d github.com/peng49/gocron`
+- `go get -d github.com/ppanphper/gocron`
 - `export GO111MODULE=on` 
 - 编译 `make`
 - 启动
@@ -67,7 +67,7 @@
 ### docker
 
 ```shell
-docker run --name gocron --link mysql:db -p 5920:5920 -d peng49/gocron
+docker run --name gocron --link mysql:db -p 5920:5920 -d ppanphper/gocron
 ```
 
 配置: /app/conf/app.ini
@@ -124,7 +124,7 @@ docker run --name gocron --link mysql:db -p 5920:5920 -d peng49/gocron
 * RPC框架 [gRPC](https://github.com/grpc/grpc)
 
 ## 反馈
-提交[issue](https://github.com/peng49/gocron/issues/new)
+提交[issue](https://github.com/ppanphper/gocron/issues/new)
 
 ## ChangeLog
 

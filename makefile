@@ -6,25 +6,38 @@ build: gocron node
 .PHONY: build-race
 build-race: enable-race build
 
+.PHONY: debug
+debug: $(eval GO_DEBUG = -gcflags "all=-N -l")
+
 .PHONY: run
-run: build kill
-	./bin/gocron-node &
+run: run-web run-node
+
+.PHONY: run-web
+run-web: install-vue build-vue statik gocron kill-web
 	./bin/gocron web -e dev
+
+.PHONY: run-node
+run-node: node kill-node
+	./bin/gocron-node
 
 .PHONY: run-race
 run-race: enable-race run
 
-.PHONY: kill
-kill:
+.PHONY: kill-web
+kill-web:
+	-killall gocron
+
+.PHONY: kill-node
+kill-node:
 	-killall gocron-node
 
 .PHONY: gocron
 gocron:
-	go build $(RACE) -o bin/gocron ./cmd/gocron
+	go build $(RACE) $(GO_DEBUG) -o bin/gocron ./cmd/gocron
 
 .PHONY: node
 node:
-	go build $(RACE) -o bin/gocron-node ./cmd/node
+	go build $(RACE) $(GO_DEBUG) -o bin/gocron-node ./cmd/node
 
 .PHONY: test
 test:
@@ -47,20 +60,20 @@ package-all: build-vue statik
 
 .PHONY: build-vue
 build-vue:
-	cd web/vue && npm run build
+	cd web/vue && yarn run build
 	cp -r web/vue/dist/* web/public/
 
 .PHONY: install-vue
 install-vue:
-	cd web/vue && npm install
+	cd web/vue && yarn install --frozen-lockfile
 
 .PHONY: run-vue
 run-vue:
-	cd web/vue && npm run dev
+	cd web/vue && yarn run serve
 
 .PHONY: statik
 statik:
-	go get github.com/rakyll/statik
+	go install github.com/rakyll/statik
 	go generate ./...
 
 .PHONY: lint

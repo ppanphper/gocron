@@ -33,7 +33,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: gocron
-        image: peng49/gocron:latest
+        image: phperdocker/gocron:latest
         ports:
         - containerPort: 5920
           name: gocron

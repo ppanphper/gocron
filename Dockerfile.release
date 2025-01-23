@@ -1,7 +1,7 @@
-FROM golang:1.18-alpine as builder
+FROM golang:1.23-alpine AS builder
 
 RUN apk update \
-    && apk add --no-cache git ca-certificates make bash yarn nodejs npm
+    && apk add --no-cache git ca-certificates make bash yarn nodejs
 
 COPY . /var/www/gocron
 
@@ -17,7 +17,7 @@ RUN go env -w GO111MODULE=on && \
     make statik &&  \
     CGO_ENABLED=0 make gocron
 
-FROM alpine:3.12
+FROM alpine:latest
 
 RUN apk add --no-cache ca-certificates tzdata \
     && addgroup -S app \

@@ -124,5 +124,15 @@ export default {
         })
         handle(promise, next)
     },
+    delete(uri, data, next) {
+        const promise = axios.delete(uri, Qs.stringify(data), {
+            headers: {
+                delete: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }
+        })
+        handle(promise, next)
+    },
     instance: instance
 }

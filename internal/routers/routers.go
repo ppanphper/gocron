@@ -110,6 +110,7 @@ func Register(m *macaron.Macaron) {
 		m.Post("/enable/:id", process.Enable)
 		m.Post("/disable/:id", process.Disable)
 		m.Post("/restart/:id", process.Restart)
+		m.Delete("/:id", process.Delete)
 	})
 
 	m.Group("/project", func() {
@@ -311,7 +312,7 @@ func urlAuth(ctx *macaron.Context) {
 	ctx.Write([]byte(data))
 }
 
-//操作日志中间键
+// 操作日志中间键
 func operateLogMiddleware(req *http.Request, ctx *macaron.Context) {
 	ctx.Next()
 	// 不记录GET请求的日志

@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: gocron-web
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      daemon: gocron-web
+  template:
+    metadata:
+      labels:
+        daemon: gocron-web
+      name: gocron-web
+    spec:
+      containers:
+      - name: gocron-web
+        image: docker.io/phperdocker/gocron:v2.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5921
+          hostPort: 5921
+          name: gocron-web
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/log
+          name: syslog
+      hostNetwork: true
+      hostPID: true
+      restartPolicy: Always
+      volumes:
+      - hostPath:
+          path: /var/log
+          type: Directory
+        name: syslog

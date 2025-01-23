@@ -2,7 +2,7 @@
  
 # 生成压缩包 xx.tar.gz或xx.zip
 # 使用 ./package.sh -a amd664 -p linux -v v2.0.0
- 
+
 # 任何命令返回非0值退出
 set -o errexit
 # 使用未定义的变量退出
@@ -11,7 +11,7 @@ set -o nounset
 set -o pipefail
 
 eval $(go env)
-
+ 
 # 二进制文件名
 BINARY_NAME=''
 # main函数所在文件
@@ -33,7 +33,8 @@ DEFAULT_ARCH=${GOHOSTARCH}
 # 支持的系统
 SUPPORT_OS=(linux darwin windows)
 # 支持的架构
-SUPPORT_ARCH=(386 amd64)
+SUPPORT_ARCH=(386 amd64 arm64)
+
  
 # 编译参数
 LDFLAGS=''
@@ -43,7 +44,7 @@ INCLUDE_FILE=()
 PACKAGE_DIR=''
 # 编译文件生成目录
 BUILD_DIR=''
- 
+
 # 获取git 最新tag name
 git_latest_tag() {
     local COMMIT_ID=""
@@ -88,7 +89,7 @@ set_os_arch() {
         fi
     done
  
-    for ARCH in "${INPUT_ARCH[@]}";do
+    for ARCH in "${INPUT_ARCH[@]}"; do
         if [[ ! "${SUPPORT_ARCH[*]}" =~ ${ARCH} ]]; then
             print_message_and_exit "不支持的CPU架构${ARCH}"
         fi
@@ -193,24 +194,88 @@ package_gocron_node() {
 
     run
 }
+
+
+# Docker 相关变量
+INPUT_PUSH_DOCKER=0 # 是否push到docker hub
+DOCKER_USERNAME="" # 你的 Docker Hub 用户名 (或阿里云/其他仓库的命名空间)
+DOCKER_REGISTRY="docker.io" # 如果是 Docker Hub 则留空，如果是阿里云则为 registry.cn-hangzhou.aliyuncs.com 等
+DOCKER_IMAGE_NAME="gocron" # Docker 镜像名称，默认为 gocron
+DOCKER_DOCKEFILE="Dockerfile" # Docker 镜像名称，默认为 gocron
+DOCKER_ISLOGINED=0 # 是否已登录
+ 
+# Docker 构建和推送
+docker_build_and_push() {
+    local IMAGE_FULL_NAME=""
+    local DOCKER_IMAGE_TAG="${VERSION}" # Docker 镜像标签，默认为 VERSION 变量的值
+    if [ -n "$DOCKER_REGISTRY" ]; then
+        IMAGE_FULL_NAME="$DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG"
+    else
+        IMAGE_FULL_NAME="$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG"
+    fi
+
+    if docker pull "$IMAGE_FULL_NAME" --dry-run > /dev/null 2>&1; then
+      echo "Delete Docker image: $IMAGE_FULL_NAME"
+      docker rmi "$IMAGE_FULL_NAME"
+      if [[ $? -eq 0 ]]; then
+        echo "Image $IMAGE_FULL_NAME deleted successfully."
+      else
+        echo "Failed to delete image $IMAGE_FULL_NAME."
+      fi
+    fi
+
+    echo "Building Docker image: $IMAGE_FULL_NAME"
+
+    docker build -t "$IMAGE_FULL_NAME" -f "$DOCKER_DOCKEFILE" .
+
+    if [ "$DOCKER_ISLOGINED" -eq 0 ]; then
+      echo "Logging in to Docker registry..."
+      if [ -n "$DOCKER_REGISTRY" ]; then
+          docker login --username="$DOCKER_USERNAME" "$DOCKER_REGISTRY"
+      else
+          docker login
+      fi
+      DOCKER_ISLOGINED=1
+    fi
+
+    echo "Pushing Docker image: $IMAGE_FULL_NAME"
+    docker push "$IMAGE_FULL_NAME"
+
+    echo "Docker build and push completed."
+}
+
+docker_build_and_push_web() {
+  DOCKER_IMAGE_NAME="gocron"
+  DOCKER_DOCKEFILE="Dockerfile"
+  docker_build_and_push
+}
+
+docker_build_and_push_node() {
+  DOCKER_IMAGE_NAME="gocron-node"
+  DOCKER_DOCKEFILE="Dockerfile-node"
+  docker_build_and_push
+}
  
 # p 平台 linux darwin windows
 # a 架构 386 amd64
 # v 版本号  默认取git最新tag
-while getopts "p:a:v:" OPT;
+while getopts "p:a:v:d:" OPT;
 do
     case ${OPT} in
-    p) IPS=',' read -r -a INPUT_OS <<< "${OPTARG}"
-    ;;
-    a) IPS=',' read -r -a INPUT_ARCH <<< "${OPTARG}"
-    ;;
-    v) VERSION=$OPTARG
-    ;;
-    *)
-    ;;
+    p) IFS=',' read -r -a INPUT_OS <<< "$OPTARG" ;;
+    a) IFS=',' read -r -a INPUT_ARCH <<< "$OPTARG" ;;
+    d) INPUT_PUSH_DOCKER=$OPTARG ;; # 设置 INPUT_PUSH_DOCKER 的值
+    v) VERSION=$OPTARG ;;
+    *) ;;
     esac
 done
  
 package_gocron
 package_gocron_node
 
+
+if [ "$INPUT_PUSH_DOCKER" -eq 1 ]; then
+    echo "push docker"
+    docker_build_and_push_web
+    docker_build_and_push_node
+fi
